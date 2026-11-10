@@ -15,7 +15,12 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f9fa}
 html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
-#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:linear-gradient(#58aade 0%,#a8dafa 48%,#f7dcb4 65%,#4fbbbf 100%)}
+#sky{position:fixed;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 29% 10% at 72% 29%,rgba(255,255,232,.63),transparent 80%),
+  radial-gradient(ellipse 25% 8% at 16% 22%,rgba(255,255,255,.22),transparent 76%),
+  radial-gradient(ellipse 23% 7% at 64% 15%,rgba(255,255,255,.18),transparent 75%),
+  linear-gradient(180deg,#4586b8 0%,#72b2d5 30%,#b7dbe2 58%,#f9d5a5 78%,#c9dcce 100%);}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:transparent}
 #shade{pointer-events:none;position:fixed;inset:0;background:#03172e;opacity:0;z-index:1}
 #vignette{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 46%,rgba(0,16,30,.35) 100%);z-index:2}
 #hud{position:fixed;inset:0;z-index:3;pointer-events:none}
@@ -47,17 +52,18 @@ html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:n
 </style>
 </head>
 <body>
+<div id="sky" aria-hidden="true"></div>
 <canvas id="game" aria-label="3D island survival game"></canvas>
 <div id="shade"></div><div id="vignette"></div>
 <div id="hud">
-  <div id="stats"><div class="heading">TIDEBREAK <span style="font-size:9px;color:#a7d9da">ALPHA 0.1</span></div>
+  <div id="stats"><div class="heading">TIDEBREAK <span style="font-size:9px;color:#a7d9da">ALPHA 0.1.1</span></div>
     <div class="stat"><label>HEALTH</label><div class="meter"><span id="hp" style="width:100%"></span></div></div>
     <div class="stat"><label>FOOD</label><div class="meter"><span id="hunger" style="width:100%"></span></div></div>
     <div class="stat"><label>WATER</label><div class="meter"><span id="thirst" style="width:100%"></span></div></div>
     <div id="status">DAY 1 · Clear skies</div>
   </div>
   <div id="topButtons"><button class="ui" id="invBtn">BAG</button><button class="ui" id="craftBtn">CRAFT</button><button class="ui" id="pauseBtn">Ⅱ</button></div>
-  <div id="helpHint">Left thumb: move · Right side: look</div><div id="reticle"></div><div id="pickupHint"></div><div id="toast"></div>
+  <div id="helpHint">Left thumb: move · Right side: look (horizontal inverted)</div><div id="reticle"></div><div id="pickupHint"></div><div id="toast"></div>
   <div id="lookZone" aria-label="Look around by dragging"></div>
   <div id="joy" aria-label="Movement thumbstick"><div id="knob"></div></div>
   <div id="actions"><button id="actJump" class="act">JUMP</button><button id="actRun" class="act">RUN</button><button id="actCollect" class="act">PICK UP</button></div>
@@ -66,13 +72,13 @@ html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:n
 <div id="menu" class="modal"><div class="panel">
   <div class="sub">A NEW ORIGINAL ISLAND SURVIVAL GAME</div><h1>TIDEBREAK</h1>
   <p>Shipwrecked on an isolated tropical island. Search the shore, gather supplies, manage hunger and thirst, and build your first survival tools.</p>
-  <p><strong>iPhone:</strong> left thumb moves · drag the right side to look · PICK UP collects nearby items. <strong>Xbox controller:</strong> sticks move/look · A jumps · X collects · Y crafts · B opens bag.</p>
+  <p><strong>iPhone:</strong> left thumb moves · drag the right side to look (horizontal inverted) · PICK UP collects nearby items. <strong>Xbox controller:</strong> sticks move/look · A jumps · X collects · Y crafts · B opens bag.</p>
   <div class="btnrow"><button id="startBtn" class="mainBtn">START SURVIVING</button><button id="resetBtn" class="outlineBtn">NEW WORLD</button></div>
   <p class="warning">Free alpha prototype • No account, purchases, or external game engine required. Saves stay in this browser on this device. This is a browser game, not yet a native Xbox or App Store app.</p>
 </div></div>
 <div id="inventory" class="modal hidden"><div class="panel"><h2>BACKPACK</h2><div class="inv" id="invGrid"></div><p>Collect resources nearby. Coconuts can be eaten or drunk. Tools and structures are made in the crafting menu.</p><div class="btnrow"><button class="mainBtn" id="drinkBtn">DRINK COCONUT</button><button class="outlineBtn" id="eatBtn">EAT COCONUT</button><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
 <div id="craft" class="modal hidden"><div class="panel"><h2>CRAFTING</h2><p>Use resources you pick up from the beach and island.</p><div id="recipes"></div><div class="btnrow"><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
-<div id="pause" class="modal hidden"><div class="panel"><h2>PAUSED</h2><p>Save your progress, then continue exploring.</p><div class="btnrow"><button id="saveBtn" class="mainBtn">SAVE GAME</button><button id="backupBtn" class="outlineBtn">BACKUP TO FILE</button><label class="outlineBtn" for="restoreFile">RESTORE BACKUP</label><input id="restoreFile" type="file" accept=".json,application/json" style="display:none"/><button class="outlineBtn closeBtn">RESUME</button></div><p class="warning">Clearing Safari website data can erase this save. Tap BACKUP TO FILE, then keep the downloaded .json file in Files or iCloud Drive.</p></div></div>
+<div id="pause" class="modal hidden"><div class="panel"><h2>PAUSED</h2><p>Save your progress, then continue exploring.</p><div class="btnrow"><button id="saveBtn" class="mainBtn">SAVE GAME</button><button id="graphicsBtn" class="outlineBtn">GRAPHICS: BALANCED</button><button id="backupBtn" class="outlineBtn">BACKUP TO FILE</button><label class="outlineBtn" for="restoreFile">RESTORE BACKUP</label><input id="restoreFile" type="file" accept=".json,application/json" style="display:none"/><button class="outlineBtn closeBtn">RESUME</button></div><p class="warning">Quality mode increases detail but may heat your phone. Balanced is the recommended default. Clearing Safari website data can erase this save. Tap BACKUP TO FILE, then keep the downloaded .json file in Files or iCloud Drive.</p></div></div>
 <script>
 'use strict';
 (()=>{
@@ -80,7 +86,7 @@ const canvas=document.getElementById('game');
 const gl=canvas.getContext('webgl',{alpha:true,antialias:false,powerPreference:'high-performance',depth:true});
 if(!gl){document.querySelector('#menu .panel p').textContent='This browser does not support WebGL. Please open the game in a recent version of Safari.';document.getElementById('startBtn').disabled=true;return;}
 const $=id=>document.getElementById(id);
-const SAVE='tidebreak-v01-save';
+const SAVE='tidebreak-v01-save'; // same save key as v0.1: existing worlds are retained
 const PI=Math.PI, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 const V=(x,y,z)=>[x,y,z], add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{let n=Math.hypot(...a)||1;return a.map(x=>x/n)};
 let worldSeed=12345, rngState=worldSeed;
@@ -88,28 +94,66 @@ function rnd(){rngState=(1664525*rngState+1013904223)>>>0;return rngState/429496
 const rrange=(a,b)=>a+(b-a)*rnd();
 function height(x,z){let a=Math.atan2(z,x), r=Math.hypot(x,z),radius=73+4.5*Math.sin(a*3+1.8)+3.7*Math.sin(a*7-2.3)+2*Math.cos(a*11);let t=r/radius,base=9.7*(1-Math.pow(Math.min(t,1.3),1.7))-1.7;let bump=(Math.sin(x*.15+z*.06)*.5+Math.cos(z*.19-x*.08)*.46+Math.sin(x*.4+z*.34)*.12)*Math.max(0,1-t)*2.1;return base+bump;}
 function land(x,z){return height(x,z)>.08}
-function meshBuilder(){let v=[],n=[],c=[];function tri(a,b,d,color){let nn=norm(cross(sub(b,a),sub(d,a)));for(let p of [a,b,d]){v.push(...p);n.push(...nn);c.push(...color)}}function quad(a,b,d,e,col){tri(a,b,d,col);tri(a,d,e,col)}
-function cyl(x,y,z,topY,r1,r2,color,segments=7,dx=0,dz=0){for(let i=0;i<segments;i++){let a=i*2*PI/segments,b=(i+1)*2*PI/segments;let u=V(x+Math.cos(a)*r1,y,z+Math.sin(a)*r1),v=V(x+Math.cos(b)*r1,y,z+Math.sin(b)*r1),w=V(x+dx+Math.cos(b)*r2,topY,z+dz+Math.sin(b)*r2),t=V(x+dx+Math.cos(a)*r2,topY,z+dz+Math.sin(a)*r2);quad(u,v,w,t,color)} }
+function meshBuilder(){let v=[],n=[],c=[];
+function push(p,normal,color){v.push(...p);n.push(...normal);c.push(...color);}
+function tri(a,b,d,color){let nn=norm(cross(sub(b,a),sub(d,a)));for(let p of [a,b,d])push(p,nn,color);}
+function triSmooth(a,b,d,ca,cb,cd,na,nb,nd){push(a,na,ca);push(b,nb,cb);push(d,nd,cd);}
+function quad(a,b,d,e,col){tri(a,b,d,col);tri(a,d,e,col);}
+function quadSmooth(a,b,d,e,colors,normals){triSmooth(a,b,d,colors[0],colors[1],colors[2],normals[0],normals[1],normals[2]);triSmooth(a,d,e,colors[0],colors[2],colors[3],normals[0],normals[2],normals[3]);}
+function cyl(x,y,z,topY,r1,r2,color,segments=7,dx=0,dz=0){for(let i=0;i<segments;i++){let a=i*2*PI/segments,b=(i+1)*2*PI/segments;let u=V(x+Math.cos(a)*r1,y,z+Math.sin(a)*r1),vv=V(x+Math.cos(b)*r1,y,z+Math.sin(b)*r1),w=V(x+dx+Math.cos(b)*r2,topY,z+dz+Math.sin(b)*r2),t=V(x+dx+Math.cos(a)*r2,topY,z+dz+Math.sin(a)*r2);quad(u,vv,w,t,color)}}
 function box(x,y,z,w,h,d,col){let a=V(x-w/2,y,z-d/2),b=V(x+w/2,y,z-d/2),cc=V(x+w/2,y+h,z-d/2),dd=V(x-w/2,y+h,z-d/2),e=V(x-w/2,y,z+d/2),f=V(x+w/2,y,z+d/2),g=V(x+w/2,y+h,z+d/2),hh=V(x-w/2,y+h,z+d/2);quad(a,b,cc,dd,col);quad(f,e,hh,g,col);quad(e,a,dd,hh,col);quad(b,f,g,cc,col);quad(dd,cc,g,hh,col);quad(e,f,b,a,col)}
 function orb(x,y,z,r,col){let pts=[[0,1,0],[1,0,0],[0,0,1],[-1,0,0],[0,0,-1],[0,-1,0]].map(p=>[x+p[0]*r,y+p[1]*r,z+p[2]*r]);for(let [i,j,k] of [[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]])tri(pts[i],pts[j],pts[k],col)}
-function finish(){return {v:new Float32Array(v),n:new Float32Array(n),c:new Float32Array(c),count:v.length/3}}return{tri,quad,cyl,box,orb,finish};}
-function buildTerrain(){let m=meshBuilder(),s=2.4,N=76;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s,corners=[[x,z],[x+s,z],[x+s,z+s],[x,z+s]].map(q=>[q[0],height(...q),q[1]]);let av=corners.reduce((v,p)=>v+p[1],0)/4;let r=Math.hypot(x+s/2,z+s/2);let col=av<.9?[.81,.71,.48]:av<1.75?[.68,.68,.39]:r<31?[.21,.41,.22]:[.28,.46,.23];m.quad(...corners,col);}return m.finish()}
-function buildWater(){let m=meshBuilder(),N=48,s=5.5;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let col=(i+j)%2?[.08,.50,.64]:[.075,.49,.62];m.quad([x,0,z],[x+s,0,z],[x+s,0,z+s],[x,0,z+s],col);}return m.finish()}
+function finish(){return {v:new Float32Array(v),n:new Float32Array(n),c:new Float32Array(c),count:v.length/3}}return{tri,triSmooth,quad,quadSmooth,cyl,box,orb,finish};}
+const smooth=(a,b,v)=>{let t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};
+const hash=(x,z)=>{let t=Math.sin(x*127.1+z*311.7)*43758.5453;return t-Math.floor(t)};
+function groundColor(x,z,h){let r=Math.hypot(x,z),v=hash(Math.floor(x*2),Math.floor(z*2));let s=.93+.13*v+.05*Math.sin(x*.33+z*.17);let sand=[.79*s,.70*s,.52*s],grass=[.235*s,.365*s,.205*s];let hill=[.29*s,.36*s,.205*s];let shore=smooth(-.5,3.05,h);let inland=smooth(2.4,6.3,h);let dry=smooth(1.5,4,h)*(1-smooth(4.4,6.8,h));let dirt=[.43*s,.355*s,.226*s];return sand.map((u,i)=>{let g=grass[i]*(1-inland)+hill[i]*inland;return u*(1-shore)+((1-dry*.18)*g+dry*.18*dirt[i])*shore;});}
+function terrainNormal(x,z){let d=.45;return norm([height(x-d,z)-height(x+d,z),2*d,height(x,z-d)-height(x,z+d)]);}
+function buildTerrain(){let m=meshBuilder(),s=1.7,N=112;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let xz=[[x,z],[x+s,z],[x+s,z+s],[x,z+s]];let pts=xz.map(q=>[q[0],height(...q),q[1]]);m.quadSmooth(...pts,pts.map(p=>groundColor(p[0],p[2],p[1])),pts.map(p=>terrainNormal(p[0],p[2])));}return m.finish()}
+function buildWater(){let m=meshBuilder(),N=68,s=6.1;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let col=[.06,.35,.47];m.quad([x,0,z],[x+s,0,z],[x+s,0,z+s],[x,0,z+s],col);}return m.finish()}
 let resources=[], trees=[], rocks=[], worldMesh;
 function spawnWorld(){rngState=worldSeed;resources=[];trees=[];rocks=[];let m=meshBuilder();
-for(let k=0;k<45;k++){let a=rrange(0,2*PI),r=rrange(18,65),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.3||y>5.2)continue;let scale=rrange(.78,1.35),le=rrange(1,2.2),h=5.3*scale;let lx=Math.cos(a)*le*.5,lz=Math.sin(a)*le*.5;
-m.cyl(x,y,z,y+h,.36*scale,.23*scale,[.42,.27,.13],7,lx,lz);
+// Original seeded placements and random-call counts are preserved to keep v0.1 saves stable.
+for(let k=0;k<45;k++){let a=rrange(0,2*PI),r=rrange(18,65),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.3||y>5.2)continue;let scale=rrange(.78,1.35),le=rrange(1,2.2),h=5.3*scale,lx=Math.cos(a)*le*.5,lz=Math.sin(a)*le*.5;
+// Curved, segmented palms with varied bark tones.
+let segments=5;for(let seg=0;seg<segments;seg++){let t=seg/segments,t2=(seg+1)/segments,bx=x+lx*t*t,bz=z+lz*t*t,ex=x+lx*t2*t2,ez=z+lz*t2*t2;
+let hue=.95+.08*Math.sin(k*7.6+seg*1.1);m.cyl(bx,y+h*t,bz,y+h*t2,(.39-.13*t)*scale,(.37-.15*t2)*scale,[.38*hue,.29*hue,.18*hue],9,ex-bx,ez-bz);
+// Fine dark bark seams following the curvature.
+for(let stripe=0;stripe<3;stripe++){let theta=(stripe/3)*PI*2+seg*.22+k;let sx=bx+Math.cos(theta)*(.39-.13*t)*scale,sz=bz+Math.sin(theta)*(.39-.13*t)*scale;
+m.cyl(sx,y+h*t+.04,sz,y+h*t2-.05,.018*scale,.014*scale,[.27,.19,.115],4,ex-bx,ez-bz);}}
 let tx=x+lx,tz=z+lz,ty=y+h;
-for(let f=0;f<8;f++){let angle=f*2*PI/8+rrange(-.14,.14),len=rrange(2.3,3.7)*scale,dx=Math.cos(angle),dz=Math.sin(angle);let c=[.15+rrange(0,.08),.39+rrange(0,.09),.18];let start=[tx,ty+.17,tz],mid=[tx+dx*len*.46,ty+.65,tz+dz*len*.46],end=[tx+dx*len,ty-len*.18,tz+dz*len],side=[-dz*.48*scale,0,dx*.48*scale];m.tri(start,add(mid,side),mid,c);m.tri(start,mid,sub(mid,side),c);m.tri(mid,add(mid,side),end,c);m.tri(mid,end,sub(mid,side),c);}
-for(let f=0;f<3;f++){let off=f*PI*2/3;m.orb(tx+Math.cos(off)*.35,ty-.35,tz+Math.sin(off)*.35,.29*scale,[.39,.28,.13]);}trees.push({x,z,scale});}
-for(let k=0;k<34;k++){let a=rrange(0,2*PI),r=rrange(2,68),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.1)continue;let sz=rrange(.45,1.4);m.orb(x,y+sz*.4,z,sz,[.39,.40,.38]);rocks.push({x,z,sz});}
-for(let k=0;k<250;k++){let x=rrange(-65,65),z=rrange(-65,65),y=height(x,z);if(y<1.5)continue;let sz=rrange(.17,.46);let g=[.32,.50,.24];m.tri([x,y,z],[x+sz,y+sz*2,z+sz*.1],[x+sz*.5,y,z+sz*.4],g);m.tri([x,y,z],[x-sz,y+sz*1.8,z-sz*.2],[x-sz*.5,y,z-sz*.4],g);}
-for(let i=0;i<83;i++){let a=rrange(0,2*PI),r=rrange(5,66),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.25)continue;let types=['stone','wood','fiber','coconut'],type=types[i%4];let item={id:i,type,x,z,y,active:true,cooldown:0};resources.push(item);}
+for(let f=0;f<8;f++){let angle=f*2*PI/8+rrange(-.14,.14),len=rrange(2.3,3.7)*scale,dx=Math.cos(angle),dz=Math.sin(angle),shade=.15+rrange(0,.08),g=.39+rrange(0,.09);let leaf=[shade,g,.18],leafDark=[shade*.72,g*.71,.13],leafLit=[Math.min(.45,shade*1.5),Math.min(.7,g*1.25),.22];
+// Six curved frond segments, narrowing naturally toward the tip.
+function point(t){let arch=.68*Math.sin(Math.PI*t)-.48*t*t*len*.40;return [tx+dx*len*t,ty+.19+arch,tz+dz*len*t];}
+for(let seg=0;seg<6;seg++){let t=seg/6,t2=(seg+1)/6,mid=(t+t2)/2,width=Math.sin(Math.PI*(.055+.89*mid))*.46*scale*(1-.16*mid);let p0=point(t),p1=point(t2);let perp=[-dz,0,dx],center=point(mid);let left=add(center,perp.map(v=>v*width)),right=sub(center,perp.map(v=>v*width));m.tri(p0,left,p1,leafLit);m.tri(p0,p1,right,leafDark);
+// Slim alternating leaflets give palms a feathered silhouette.
+if(seg>=1&&seg<5){let tip=point(Math.min(1,mid+.21)),short=.9*scale*(1-mid*.38);let l=add(center,perp.map(v=>v*short)),rr=sub(center,perp.map(v=>v*short));l[1]-=.18*scale;rr[1]-=.18*scale;m.tri(center,l,tip,leaf);m.tri(center,tip,rr,leafDark);}}
+}for(let f=0;f<3;f++){let off=f*PI*2/3;m.orb(tx+Math.cos(off)*.35,ty-.35,tz+Math.sin(off)*.35,.29*scale,[.39,.28,.13]);}
+trees.push({x,z,scale});}
+for(let k=0;k<34;k++){let a=rrange(0,2*PI),r=rrange(2,68),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.1)continue;let sz=rrange(.45,1.4);m.orb(x,y+sz*.4,z,sz,[.43,.435,.405]);rocks.push({x,z,sz});}
+for(let k=0;k<250;k++){let x=rrange(-65,65),z=rrange(-65,65),y=height(x,z);if(y<1.5)continue;let sz=rrange(.17,.46),green=[.25,.43,.20];m.tri([x,y,z],[x+sz,y+sz*2,z+sz*.1],[x+sz*.5,y,z+sz*.4],green);m.tri([x,y,z],[x-sz,y+sz*1.8,z-sz*.2],[x-sz*.5,y,z-sz*.4],green);}
+for(let i=0;i<83;i++){let a=rrange(0,2*PI),r=rrange(5,66),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.25)continue;let types=['stone','wood','fiber','coconut'],type=types[i%4];resources.push({id:i,type,x,z,y,active:true,cooldown:0});}
+// New decorative scatter uses a SEPARATE random stream: existing items stay in place.
+let seed=(worldSeed^0x5c3e91ab)>>>0;function decorRand(){seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296;}
+for(let k=0;k<830;k++){let x=(decorRand()-.5)*146,z=(decorRand()-.5)*146,y=height(x,z);if(y<.20||y>8.7)continue;let t=decorRand();if(y<2.8){if(t<.47){let sz=.07+decorRand()*.13,co=t<.25?[.70,.62,.48]:[.56,.53,.46];m.orb(x,y+sz*.1,z,sz,co);}else if(t<.68){let len=.35+decorRand()*.8;m.cyl(x,y+.045,z,y+.07,.035,.025,[.39,.28,.17],5,len*.8,len*.2);}else{let b=.12+decorRand()*.21;m.tri([x,y+.025,z],[x+b,y+.04,z+b*.28],[x+b*.6,y+.13,z+b*.5],[.75,.69,.53]);}}
+else {let sz=.14+decorRand()*.45,col=t<.45?[.28,.47,.21]:t<.78?[.36,.51,.23]:[.34,.40,.16];m.tri([x,y,z],[x+sz*.35,y+sz*2,z+sz*.24],[x+sz*.8,y,z+sz*.50],col);m.tri([x,y,z],[x-sz*.5,y+sz*1.6,z],[x-sz,y,z-sz*.35],col);if(t>.86)m.orb(x,y+.12,z,.2,[.30,.38,.19]);}}
 worldMesh=m.finish();}
 const recipes=[{key:'knife',name:'Stone knife',need:{stone:1,fiber:1},label:'Cutting tool'},{key:'axe',name:'Stone axe',need:{stone:2,wood:1,fiber:2},label:'A basic survival axe'},{key:'campfire',name:'Campfire',need:{stone:3,wood:3},label:'A permanent landmark'},{key:'shelter',name:'Lean-to shelter',need:{wood:4,fiber:4},label:'A place to rest'}];
 function itemMesh(type){let m=meshBuilder();if(type==='stone'){m.orb(0,.28,0,.41,[.52,.53,.48]);m.orb(.17,.16,.05,.19,[.59,.60,.55]);}if(type==='wood'){m.cyl(-.48,.18,0,.24,.19,.2,[.43,.27,.11],6,.96,0);m.box(0,.18,0,.86,.15,.29,[.45,.30,.16]);}if(type==='fiber'){for(let i=0;i<6;i++){let a=i*PI/3;m.tri([0,.06,0],[Math.cos(a)*.28,.52,Math.sin(a)*.28],[Math.cos(a+.35)*.30,.04,Math.sin(a+.35)*.30],[.25,.55,.21]);}}if(type==='coconut'){m.orb(0,.45,0,.45,[.33,.24,.13]);m.orb(.22,.48,.06,.1,[.39,.30,.16]);}return m.finish()}
-const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;uniform mat4 uVP;uniform vec3 uTranslation;uniform vec3 uCamera;uniform float uTime;uniform float uIsWater;varying vec3 vColor;varying vec3 vPosition;varying float vLight;void main(){vec3 pos=aPosition+uTranslation;if(uIsWater>0.5){pos.y+=sin(pos.x*.23+uTime*1.3)*.12+cos(pos.z*.19-uTime*1.5)*.11;}vPosition=pos;vColor=aColor;vLight=.74+max(0.,dot(normalize(aNormal),normalize(vec3(.53,1.,.26))))*.26;gl_Position=uVP*vec4(pos,1.);}`;
-const frag=`precision highp float;varying vec3 vColor;varying vec3 vPosition;varying float vLight;uniform vec3 uCamera;uniform float uIsWater;uniform float uTime;uniform float uNight;void main(){vec3 c=vColor*vLight;if(uIsWater>0.5){float w=sin(vPosition.x*.36+uTime)*cos(vPosition.z*.27-uTime*.6);c+=vec3(.025,.075,.10)*w;}float dist=length(vPosition-uCamera);float fog=smoothstep(70.,166.,dist)*.75;c=mix(c,vec3(.59,.76,.83),fog);c*=1.-uNight*.43;gl_FragColor=vec4(c,1.);}`;
+const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;uniform mat4 uVP;uniform vec3 uTranslation;uniform float uTime;uniform float uIsWater;varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;void main(){vec3 pos=aPosition+uTranslation;if(uIsWater>0.5){pos.y+=sin(pos.x*.23+uTime*1.33)*.095+cos(pos.z*.17-uTime*1.18)*.10+sin((pos.x+pos.z)*.095+uTime*.7)*.045;}vWorldPos=pos;vColor=aColor;vNormal=aNormal;gl_Position=uVP*vec4(pos,1.);}`;
+const frag=`precision mediump float;varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;uniform vec3 uCamera;uniform float uIsWater;uniform float uTime;uniform float uNight;
+float hash21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),f.x),f.y);}
+void main(){vec3 col;float d=length(vWorldPos-uCamera);vec3 normal=normalize(vNormal);vec3 lightDir=normalize(vec3(.48,.86,.24));
+if(uIsWater>.5){vec2 q=vWorldPos.xz;float a=atan(q.y,q.x);float rad=73.+4.5*sin(a*3.+1.8)+3.7*sin(a*7.-2.3)+2.*cos(a*11.);float shore=length(q)-rad*.894;float shallow=1.-smoothstep(2.,27.,shore);float n=n2(q*.053+vec2(uTime*.024,-uTime*.013));vec3 deep=vec3(.026,.215,.32),tropic=vec3(.086,.48,.49);col=mix(deep,tropic,shallow*.93);col+=vec3(.017,.044,.056)*(n-.45);
+float wx=cos(q.x*.23+uTime*1.33)*.023+cos((q.x+q.y)*.095+uTime*.7)*.004;float wz=-sin(q.y*.17-uTime*1.18)*.017+cos((q.x+q.y)*.095+uTime*.7)*.004;vec3 nw=normalize(vec3(-wx,.15,-wz));vec3 viewDir=normalize(uCamera-vWorldPos);vec3 halfDir=normalize(lightDir+viewDir);float sun=pow(max(dot(nw,halfDir),0.),68.);col+=vec3(1.,.84,.61)*sun*.85;float fresnel=pow(1.-max(dot(nw,viewDir),0.),2.5);col=mix(col,vec3(.39,.68,.73),fresnel*.24);
+float foam=1.-smoothstep(-1.0,2.5,shore);float stripes=sin(shore*2.4-uTime*1.5+n*2.0);float white=foam*max(0.,stripes)*.31;col+=vec3(.51,.65,.58)*white;
+float ripple=sin(q.x*.48+uTime*1.05)*cos(q.y*.38-uTime*.88);col+=vec3(.008,.023,.03)*ripple;
+}else{
+float sunlight=.38+.62*max(dot(normal,lightDir),0.);col=vColor*sunlight;
+// Low-cost procedural sand grains, ripples, and vegetation mottling.
+float grain=hash21(floor(vWorldPos.xz*5.4));float macro=n2(vWorldPos.xz*.20);float shore=1.-smoothstep(1.1,4.0,vWorldPos.y);float sandWave=sin(vWorldPos.x*10.8+vWorldPos.z*3.6+n2(vWorldPos.xz*.56)*2.3);float surfaceVariation=(grain-.5)*.11+(macro-.5)*.12;col*=1.+surfaceVariation*mix(.5,1.15,shore);col+=vec3(.027,.021,.012)*sandWave*shore*.48;
+}
+float fog=smoothstep(63.,170.,d)*.76;vec3 fogColor=mix(vec3(.69,.81,.80),vec3(.48,.64,.74),smoothstep(75.,175.,d));col=mix(col,fogColor,fog);col*=1.-uNight*.57;gl_FragColor=vec4(col,1.);}`;
 function shader(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(sh));return sh;}
 let prog;try{prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,vert));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,frag));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(prog));}catch(e){document.querySelector('#menu .panel p').textContent='WebGL failed to start: '+e.message;return;}
 gl.useProgram(prog);const attributes={p:gl.getAttribLocation(prog,'aPosition'),n:gl.getAttribLocation(prog,'aNormal'),c:gl.getAttribLocation(prog,'aColor')};const uniforms={vp:gl.getUniformLocation(prog,'uVP'),tr:gl.getUniformLocation(prog,'uTranslation'),cam:gl.getUniformLocation(prog,'uCamera'),time:gl.getUniformLocation(prog,'uTime'),water:gl.getUniformLocation(prog,'uIsWater'),night:gl.getUniformLocation(prog,'uNight')};
@@ -138,21 +182,21 @@ const joy={x:0,y:0,pid:-1},knob=$('knob');let lookPid=-1,lastLookX=0,lastLookY=0
 function joyPointer(e){if(joy.pid!==-1&&e.pointerId!==joy.pid)return;joy.pid=e.pointerId;$('joy').setPointerCapture(e.pointerId);moveJoy(e);}
 function moveJoy(e){let rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2,dx=e.clientX-cx,dy=e.clientY-cy,len=Math.max(1,Math.hypot(dx,dy)),rad=rect.width*.33,scale=Math.min(1,rad/len);joy.x=dx*scale/rad;joy.y=dy*scale/rad;knob.style.transform=`translate(${dx*scale}px,${dy*scale}px)`;}
 $('joy').addEventListener('pointerdown',joyPointer);$('joy').addEventListener('pointermove',e=>{if(e.pointerId===joy.pid)moveJoy(e)});function joyEnd(e){if(e.pointerId!==joy.pid)return;joy.pid=-1;joy.x=0;joy.y=0;knob.style.transform='';}for(let ev of ['pointercancel','pointerup','lostpointercapture'])$('joy').addEventListener(ev,joyEnd);
-$('lookZone').addEventListener('pointerdown',e=>{if(lookPid!==-1)return;lookPid=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;$('lookZone').setPointerCapture(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookPid||paused)return;let dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;state.yaw+=dx*.005;state.pitch=clamp(state.pitch-dy*.0045,-1.27,1.27);lastLookX=e.clientX;lastLookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookPid)lookPid=-1;});
+$('lookZone').addEventListener('pointerdown',e=>{if(lookPid!==-1)return;lookPid=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;$('lookZone').setPointerCapture(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookPid||paused)return;let dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;state.yaw-=dx*.005;state.pitch=clamp(state.pitch-dy*.0045,-1.27,1.27);lastLookX=e.clientX;lastLookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookPid)lookPid=-1;});
 $('actJump').addEventListener('pointerdown',e=>{e.preventDefault();jumpRequested=true});$('actCollect').addEventListener('click',action);$('actRun').addEventListener('pointerdown',()=>runHeld=true);for(let e of ['pointerup','pointercancel','pointerleave'])$('actRun').addEventListener(e,()=>runHeld=false);
-$('invBtn').onclick=()=>modal('inventory');$('craftBtn').onclick=()=>modal('craft');$('pauseBtn').onclick=()=>modal('pause');$('startBtn').onclick=start;$('saveBtn').onclick=save;
+$('invBtn').onclick=()=>modal('inventory');$('craftBtn').onclick=()=>modal('craft');$('pauseBtn').onclick=()=>modal('pause');$('graphicsBtn').onclick=toggleGraphics;$('startBtn').onclick=start;$('saveBtn').onclick=save;
 $('resetBtn').onclick=()=>{if(window.confirm('Delete the saved world and start a new one?')){reset();start();}};
 $('backupBtn').onclick=()=>{if(!save())return;const data=localStorage.getItem(SAVE);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Tidebreak-save-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('Backup downloaded. Keep it in Files.');};
 $('restoreFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{let txt=await f.text(),data=JSON.parse(txt);if(data.version!==1||!data.state||!data.state.bag||!Number.isFinite(data.state.x)||!Number.isFinite(data.state.z))throw Error('Invalid save format');if(!confirm('Replace your current world with this backup?'))return;localStorage.setItem(SAVE,txt);if(!load())throw Error('Could not restore game');toast('Backup restored');modal('pause');}catch(err){toast('Restore failed: '+err.message)}finally{e.target.value=''}});
 for(let el of document.querySelectorAll('.closeBtn'))el.onclick=()=>modal('');$('drinkBtn').onclick=()=>consume('drink');$('eatBtn').onclick=()=>consume('eat');$('recipes').addEventListener('click',e=>{let btn=e.target.closest('[data-recipe]');if(btn)craft(+btn.dataset.recipe);});
 let keys={};document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.code==='Space')jumpRequested=true;if(e.code==='KeyE')action();if(e.code==='KeyI')modal(paused?'':'inventory');if(e.code==='KeyC')modal(paused?'':'craft');if(e.code==='Escape')modal(paused?'':'pause');});document.addEventListener('keyup',e=>keys[e.code]=false);
-let lastButtons={};function controller(dt){let arr=navigator.getGamepads?navigator.getGamepads():[],p=Array.from(arr||[]).find(x=>x&&x.connected);if(!p)return [0,0];let axes=p.axes||[],lookX=Math.abs(axes[2]||0)>.16?axes[2]:0,lookY=Math.abs(axes[3]||0)>.16?axes[3]:0;state.yaw+=lookX*dt*2.4;state.pitch=clamp(state.pitch-lookY*dt*2.2,-1.27,1.27);let map={0:()=>jumpRequested=true,1:()=>modal(paused?'':'inventory'),2:action,3:()=>modal(paused?'':'craft'),9:()=>modal(paused?'':'pause')};for(let [k,fn] of Object.entries(map)){let now=!!(p.buttons[k]&&p.buttons[k].pressed);if(now&&!lastButtons[k])fn();lastButtons[k]=now;}runHeld=!!(p.buttons[10]&&p.buttons[10].pressed);return [Math.abs(axes[0]||0)>.13?axes[0]:0,Math.abs(axes[1]||0)>.13?axes[1]:0];}
+let lastButtons={};function controller(dt){let arr=navigator.getGamepads?navigator.getGamepads():[],p=Array.from(arr||[]).find(x=>x&&x.connected);if(!p)return [0,0];let axes=p.axes||[],lookX=Math.abs(axes[2]||0)>.16?axes[2]:0,lookY=Math.abs(axes[3]||0)>.16?axes[3]:0;state.yaw-=lookX*dt*2.4;state.pitch=clamp(state.pitch-lookY*dt*2.2,-1.27,1.27);let map={0:()=>jumpRequested=true,1:()=>modal(paused?'':'inventory'),2:action,3:()=>modal(paused?'':'craft'),9:()=>modal(paused?'':'pause')};for(let [k,fn] of Object.entries(map)){let now=!!(p.buttons[k]&&p.buttons[k].pressed);if(now&&!lastButtons[k])fn();lastButtons[k]=now;}runHeld=!!(p.buttons[10]&&p.buttons[10].pressed);return [Math.abs(axes[0]||0)>.13?axes[0]:0,Math.abs(axes[1]||0)>.13?axes[1]:0];}
 function jump(){if(state.y<=Math.max(height(state.x,state.z),.1)+1.72){state.vy=5.7;}}
 function update(dt){let gp=controller(dt);if(paused)return;session+=dt;elapsed+=dt;state.time+=dt*1.9;if(state.time>1440){state.time-=1440;state.day++;}state.hunger=clamp(state.hunger-dt*.045,0,100);state.thirst=clamp(state.thirst-dt*.065,0,100);if(state.hunger<=0||state.thirst<=0)state.hp=clamp(state.hp-dt*.8,0,100);else if(state.hp<100&&state.hunger>40&&state.thirst>40)state.hp=clamp(state.hp+dt*.06,0,100);
 if(!state.hp){modal('pause');toast('You passed out. Start a new world to try again.');}
 let mx=joy.x+gp[0]+(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=-joy.y-gp[1]+(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);let len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}let fast=runHeld||keys.ShiftLeft,speed=fast?6.1:3.35;let dx=(Math.cos(state.yaw)*mx+Math.sin(state.yaw)*mz)*speed*dt,dz=(-Math.sin(state.yaw)*mx+Math.cos(state.yaw)*mz)*speed*dt;
 let nx=state.x+dx,nz=state.z+dz,edge=Math.hypot(nx,nz);if(edge<87){let ground=height(nx,nz);if(ground>-.65){state.x=nx;state.z=nz;}}
-if(keys.ArrowLeft)state.yaw-=dt*1.6;if(keys.ArrowRight)state.yaw+=dt*1.6;
+if(keys.ArrowLeft)state.yaw+=dt*1.6;if(keys.ArrowRight)state.yaw-=dt*1.6;
 let targetY=Math.max(height(state.x,state.z),.04)+1.7;
 if(jumpRequested){jump();jumpRequested=false;}
 state.vy-=12*dt;state.y+=state.vy*dt;if(state.y<targetY){state.y=targetY;state.vy=0;}
@@ -161,7 +205,11 @@ latestItem=nearestResource();$('pickupHint').style.display=latestItem?'block':'n
 $('hp').style.width=state.hp+'%';$('hunger').style.width=state.hunger+'%';$('thirst').style.width=state.thirst+'%';$('status').textContent=`DAY ${state.day} · ${Math.floor(state.time/60).toString().padStart(2,'0')}:${Math.floor(state.time%60).toString().padStart(2,'0')} · ${state.campfire?'Fire lit':'Explore the island'}`;
 if(toastTimeout>0){toastTimeout-=dt;if(toastTimeout<=0)$('toast').style.opacity=0;}if(helpTimer>0){helpTimer-=dt;if(helpTimer<=0)$('helpHint').style.display='none';}if(elapsed>25){elapsed=0;try{localStorage.setItem(SAVE,JSON.stringify({version:1,seed:worldSeed,state:{...state,bag:{...state.bag}},collected:resources.filter(r=>!r.active).map(r=>({id:r.id,cooldown:r.cooldown}))}))}catch(e){}}
 }
-function resize(){let dpr=Math.min(window.devicePixelRatio||1,1.45);let w=Math.max(1,Math.floor(window.innerWidth*dpr)),h=Math.max(1,Math.floor(window.innerHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}}
+const gfxModes=['BALANCED','QUALITY','BATTERY'];let gfxMode='BALANCED';try{let q=localStorage.getItem('tidebreak-graphics-mode');if(gfxModes.includes(q))gfxMode=q;}catch(e){}
+function toggleGraphics(){gfxMode=gfxModes[(gfxModes.indexOf(gfxMode)+1)%gfxModes.length];try{localStorage.setItem('tidebreak-graphics-mode',gfxMode);}catch(e){}updateGraphicsLabel();toast('Graphics: '+gfxMode.toLowerCase());}
+function updateGraphicsLabel(){$('graphicsBtn').textContent='GRAPHICS: '+gfxMode;}
+updateGraphicsLabel();
+function resize(){let maxDpr=gfxMode==='QUALITY'?1.8:gfxMode==='BATTERY'?1.05:1.4;let dpr=Math.min(window.devicePixelRatio||1,maxDpr);let w=Math.max(1,Math.floor(window.innerWidth*dpr)),h=Math.max(1,Math.floor(window.innerHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}}
 let lastTime=0,animationTime=0;
 function render(now){requestAnimationFrame(render);let dt=lastTime?clamp((now-lastTime)/1000,0,.04):.016;lastTime=now;resize();update(dt);animationTime+=dt;
 let sun=Math.sin((state.time/1440)*PI*2),night=clamp((-sun+.08)*.75,0,.65);$('shade').style.opacity=(night*.72).toFixed(3);
