@@ -1,0 +1,11 @@
+{
+  "name":"Tidebreak: Island Survival",
+  "short_name":"Tidebreak",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#114455",
+  "theme_color":"#114455",
+  "description":"Original offline-capable island survival game prototype.",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}

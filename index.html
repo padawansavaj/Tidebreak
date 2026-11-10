@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#114455" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Tidebreak" />
+<meta name="description" content="An original, free first-person island-survival prototype, designed for mobile touch and controllers." />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/svg+xml" href="icon.svg" /><link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<title>TIDEBREAK • Island Survival Prototype</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f9fa}
+html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:linear-gradient(#58aade 0%,#a8dafa 48%,#f7dcb4 65%,#4fbbbf 100%)}
+#shade{pointer-events:none;position:fixed;inset:0;background:#03172e;opacity:0;z-index:1}
+#vignette{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 46%,rgba(0,16,30,.35) 100%);z-index:2}
+#hud{position:fixed;inset:0;z-index:3;pointer-events:none}
+#stats{position:absolute;top:max(env(safe-area-inset-top),10px);left:max(env(safe-area-inset-left),14px);background:rgba(6,25,34,.65);border:1px solid #ffffff30;border-radius:15px;padding:11px 13px;min-width:167px;backdrop-filter:blur(8px)}
+#stats .heading{font-weight:850;font-size:13px;letter-spacing:.17em;color:#e8c992;margin-bottom:6px}
+.stat{display:flex;align-items:center;gap:9px;margin-top:5px;font-size:11px;font-weight:700}
+.stat label{width:42px;color:#d3e0e4}.meter{height:7px;background:#ffffff31;flex:1;border-radius:99px;overflow:hidden}.meter span{display:block;height:100%;border-radius:99px;transition:width .2s}#hp{background:#fc6966}#hunger{background:#f8ba5e}#thirst{background:#66cfe4}
+#status{font-size:10px;color:#e4eaf0aa;margin-top:6px;line-height:1.3}
+#topButtons{position:absolute;top:max(env(safe-area-inset-top),10px);right:max(env(safe-area-inset-right),12px);display:flex;gap:7px;pointer-events:auto}
+.ui{border:1px solid #fff5;background:rgba(6,28,40,.75);color:#fff;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:850;letter-spacing:.03em;backdrop-filter:blur(7px)}.ui:active,.ui.pressed{background:rgba(235,192,112,.65)}
+#helpHint{position:absolute;left:50%;top:13%;transform:translateX(-50%);text-align:center;background:rgba(6,25,36,.52);border-radius:12px;padding:8px 12px;font-size:12px;max-width:64vw;text-shadow:0 1px 1px #002}
+#reticle{position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);border:1.5px solid #fff8;border-radius:50%;box-shadow:0 0 8px #002}
+#pickupHint{position:absolute;left:50%;top:calc(50% + 23px);transform:translateX(-50%);background:#042a32ae;border-radius:10px;padding:5px 10px;font-size:12px;min-width:100px;text-align:center;display:none}
+#toast{position:absolute;top:24%;left:50%;transform:translateX(-50%);padding:10px 18px;background:#083b3ce8;border:1px solid #f7dba7a9;border-radius:15px;font-size:13px;font-weight:750;opacity:0;transition:opacity .2s;text-align:center;max-width:75vw}
+#joy{position:absolute;bottom:max(24px,env(safe-area-inset-bottom));left:max(22px,env(safe-area-inset-left));width:115px;height:115px;border-radius:50%;background:#d5f4ff1e;border:2px solid #d5f4ff65;pointer-events:auto;touch-action:none}
+#knob{position:absolute;width:50px;height:50px;border-radius:50%;background:#ebfaff76;box-shadow:0 2px 14px #0016;top:31px;left:31px;pointer-events:none}
+#lookZone{position:absolute;right:0;top:25%;width:52%;height:50%;pointer-events:auto;touch-action:none}
+#actions{position:absolute;right:max(env(safe-area-inset-right),18px);bottom:max(env(safe-area-inset-bottom),21px);pointer-events:auto;display:grid;grid-template-columns:68px 68px;gap:9px}
+.act{height:58px;border-radius:15px;border:2px solid #f6e8b483;color:#fff;background:rgba(3,39,54,.77);font-weight:900;font-size:12px;letter-spacing:.02em;backdrop-filter:blur(5px);text-shadow:0 1px 2px #000}.act:active{background:#96723e}
+#actCollect{grid-column:1/3;height:44px;background:#c58c41d9;border-color:#fee6a8;color:#082c31;text-shadow:none}
+.modal{position:fixed;inset:0;z-index:8;background:rgba(0,18,29,.80);display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top)) calc(15px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(15px + env(safe-area-inset-left));overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+.hidden{display:none!important}.panel{width:min(600px,100%);max-height:100%;overflow-y:auto;background:linear-gradient(135deg,#164b54,#0e2736);border:1px solid #e5c78a80;border-radius:21px;padding:24px;box-shadow:0 18px 60px #0019;touch-action:pan-y}
+.panel h1{font-size:clamp(30px,6vw,57px);margin:0;color:#f1d19a;letter-spacing:.10em;text-shadow:0 3px 0 #062d36}.panel h2{margin:0 0 13px;font-size:23px;color:#eed39f;letter-spacing:.04em}.panel p{font-size:14px;line-height:1.55;color:#dce7e7}.panel .sub{letter-spacing:.18em;font-size:11px;color:#b5dbe0;font-weight:850}.mainBtn{border:0;border-radius:12px;background:#f0bf6c;color:#12313b;font-weight:900;padding:14px 18px;font-size:15px;min-width:142px}.outlineBtn{border:1px solid #a9c9d1;border-radius:12px;background:#194e5a;color:#fff;font-weight:800;padding:12px 15px;font-size:13px}.mainBtn:disabled{opacity:.4}.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.recipe{border:1px solid #ffffff30;border-radius:12px;padding:11px 12px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff1}.recipe div{font-size:13px}.recipe small{display:block;margin-top:4px;color:#b5cdd2}.recipe button{padding:9px 11px;min-width:65px;border-radius:9px;background:#ecc681;border:none;color:#153139;font-weight:900}.recipe button:disabled{opacity:.35}
+.inv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.inv div{text-align:center;border:1px solid #e0f0f04a;padding:12px 3px;background:#173f4b;border-radius:11px;font-size:13px}.inv b{display:block;color:#e8cf9a;font-size:21px}.warning{font-size:11px;color:#efcc8a;line-height:1.55}
+#orientation{display:none;position:fixed;inset:auto 7px 8px;z-index:5;color:#fffbe5;font-size:11px;text-align:center;pointer-events:none;text-shadow:1px 1px 3px #000}
+@media(orientation:portrait){#orientation{display:block}#joy{width:102px;height:102px}#knob{top:24px;left:24px}#helpHint{top:20%}}
+@media(max-height:500px){#stats{padding:6px 10px;min-width:141px}.stat{margin-top:3px}.panel{padding:16px}.panel p{margin:7px 0}.panel h1{font-size:34px}#helpHint{top:8%}#joy{width:95px;height:95px}#knob{top:21px;left:21px}#actions{grid-template-columns:60px 60px;gap:6px}.act{height:46px}#actCollect{height:37px}}
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="3D island survival game"></canvas>
+<div id="shade"></div><div id="vignette"></div>
+<div id="hud">
+  <div id="stats"><div class="heading">TIDEBREAK <span style="font-size:9px;color:#a7d9da">ALPHA 0.1</span></div>
+    <div class="stat"><label>HEALTH</label><div class="meter"><span id="hp" style="width:100%"></span></div></div>
+    <div class="stat"><label>FOOD</label><div class="meter"><span id="hunger" style="width:100%"></span></div></div>
+    <div class="stat"><label>WATER</label><div class="meter"><span id="thirst" style="width:100%"></span></div></div>
+    <div id="status">DAY 1 · Clear skies</div>
+  </div>
+  <div id="topButtons"><button class="ui" id="invBtn">BAG</button><button class="ui" id="craftBtn">CRAFT</button><button class="ui" id="pauseBtn">Ⅱ</button></div>
+  <div id="helpHint">Left thumb: move · Right side: look</div><div id="reticle"></div><div id="pickupHint"></div><div id="toast"></div>
+  <div id="lookZone" aria-label="Look around by dragging"></div>
+  <div id="joy" aria-label="Movement thumbstick"><div id="knob"></div></div>
+  <div id="actions"><button id="actJump" class="act">JUMP</button><button id="actRun" class="act">RUN</button><button id="actCollect" class="act">PICK UP</button></div>
+</div>
+<div id="orientation">Landscape orientation gives you more room to explore.</div>
+<div id="menu" class="modal"><div class="panel">
+  <div class="sub">A NEW ORIGINAL ISLAND SURVIVAL GAME</div><h1>TIDEBREAK</h1>
+  <p>Shipwrecked on an isolated tropical island. Search the shore, gather supplies, manage hunger and thirst, and build your first survival tools.</p>
+  <p><strong>iPhone:</strong> left thumb moves · drag the right side to look · PICK UP collects nearby items. <strong>Xbox controller:</strong> sticks move/look · A jumps · X collects · Y crafts · B opens bag.</p>
+  <div class="btnrow"><button id="startBtn" class="mainBtn">START SURVIVING</button><button id="resetBtn" class="outlineBtn">NEW WORLD</button></div>
+  <p class="warning">Free alpha prototype • No account, purchases, or external game engine required. Saves stay in this browser on this device. This is a browser game, not yet a native Xbox or App Store app.</p>
+</div></div>
+<div id="inventory" class="modal hidden"><div class="panel"><h2>BACKPACK</h2><div class="inv" id="invGrid"></div><p>Collect resources nearby. Coconuts can be eaten or drunk. Tools and structures are made in the crafting menu.</p><div class="btnrow"><button class="mainBtn" id="drinkBtn">DRINK COCONUT</button><button class="outlineBtn" id="eatBtn">EAT COCONUT</button><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
+<div id="craft" class="modal hidden"><div class="panel"><h2>CRAFTING</h2><p>Use resources you pick up from the beach and island.</p><div id="recipes"></div><div class="btnrow"><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
+<div id="pause" class="modal hidden"><div class="panel"><h2>PAUSED</h2><p>Save your progress, then continue exploring.</p><div class="btnrow"><button id="saveBtn" class="mainBtn">SAVE GAME</button><button id="backupBtn" class="outlineBtn">BACKUP TO FILE</button><label class="outlineBtn" for="restoreFile">RESTORE BACKUP</label><input id="restoreFile" type="file" accept=".json,application/json" style="display:none"/><button class="outlineBtn closeBtn">RESUME</button></div><p class="warning">Clearing Safari website data can erase this save. Tap BACKUP TO FILE, then keep the downloaded .json file in Files or iCloud Drive.</p></div></div>
+<script>
+'use strict';
+(()=>{
+const canvas=document.getElementById('game');
+const gl=canvas.getContext('webgl',{alpha:true,antialias:false,powerPreference:'high-performance',depth:true});
+if(!gl){document.querySelector('#menu .panel p').textContent='This browser does not support WebGL. Please open the game in a recent version of Safari.';document.getElementById('startBtn').disabled=true;return;}
+const $=id=>document.getElementById(id);
+const SAVE='tidebreak-v01-save';
+const PI=Math.PI, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
+const V=(x,y,z)=>[x,y,z], add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{let n=Math.hypot(...a)||1;return a.map(x=>x/n)};
+let worldSeed=12345, rngState=worldSeed;
+function rnd(){rngState=(1664525*rngState+1013904223)>>>0;return rngState/4294967296;}
+const rrange=(a,b)=>a+(b-a)*rnd();
+function height(x,z){let a=Math.atan2(z,x), r=Math.hypot(x,z),radius=73+4.5*Math.sin(a*3+1.8)+3.7*Math.sin(a*7-2.3)+2*Math.cos(a*11);let t=r/radius,base=9.7*(1-Math.pow(Math.min(t,1.3),1.7))-1.7;let bump=(Math.sin(x*.15+z*.06)*.5+Math.cos(z*.19-x*.08)*.46+Math.sin(x*.4+z*.34)*.12)*Math.max(0,1-t)*2.1;return base+bump;}
+function land(x,z){return height(x,z)>.08}
+function meshBuilder(){let v=[],n=[],c=[];function tri(a,b,d,color){let nn=norm(cross(sub(b,a),sub(d,a)));for(let p of [a,b,d]){v.push(...p);n.push(...nn);c.push(...color)}}function quad(a,b,d,e,col){tri(a,b,d,col);tri(a,d,e,col)}
+function cyl(x,y,z,topY,r1,r2,color,segments=7,dx=0,dz=0){for(let i=0;i<segments;i++){let a=i*2*PI/segments,b=(i+1)*2*PI/segments;let u=V(x+Math.cos(a)*r1,y,z+Math.sin(a)*r1),v=V(x+Math.cos(b)*r1,y,z+Math.sin(b)*r1),w=V(x+dx+Math.cos(b)*r2,topY,z+dz+Math.sin(b)*r2),t=V(x+dx+Math.cos(a)*r2,topY,z+dz+Math.sin(a)*r2);quad(u,v,w,t,color)} }
+function box(x,y,z,w,h,d,col){let a=V(x-w/2,y,z-d/2),b=V(x+w/2,y,z-d/2),cc=V(x+w/2,y+h,z-d/2),dd=V(x-w/2,y+h,z-d/2),e=V(x-w/2,y,z+d/2),f=V(x+w/2,y,z+d/2),g=V(x+w/2,y+h,z+d/2),hh=V(x-w/2,y+h,z+d/2);quad(a,b,cc,dd,col);quad(f,e,hh,g,col);quad(e,a,dd,hh,col);quad(b,f,g,cc,col);quad(dd,cc,g,hh,col);quad(e,f,b,a,col)}
+function orb(x,y,z,r,col){let pts=[[0,1,0],[1,0,0],[0,0,1],[-1,0,0],[0,0,-1],[0,-1,0]].map(p=>[x+p[0]*r,y+p[1]*r,z+p[2]*r]);for(let [i,j,k] of [[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]])tri(pts[i],pts[j],pts[k],col)}
+function finish(){return {v:new Float32Array(v),n:new Float32Array(n),c:new Float32Array(c),count:v.length/3}}return{tri,quad,cyl,box,orb,finish};}
+function buildTerrain(){let m=meshBuilder(),s=2.4,N=76;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s,corners=[[x,z],[x+s,z],[x+s,z+s],[x,z+s]].map(q=>[q[0],height(...q),q[1]]);let av=corners.reduce((v,p)=>v+p[1],0)/4;let r=Math.hypot(x+s/2,z+s/2);let col=av<.9?[.81,.71,.48]:av<1.75?[.68,.68,.39]:r<31?[.21,.41,.22]:[.28,.46,.23];m.quad(...corners,col);}return m.finish()}
+function buildWater(){let m=meshBuilder(),N=48,s=5.5;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let col=(i+j)%2?[.08,.50,.64]:[.075,.49,.62];m.quad([x,0,z],[x+s,0,z],[x+s,0,z+s],[x,0,z+s],col);}return m.finish()}
+let resources=[], trees=[], rocks=[], worldMesh;
+function spawnWorld(){rngState=worldSeed;resources=[];trees=[];rocks=[];let m=meshBuilder();
+for(let k=0;k<45;k++){let a=rrange(0,2*PI),r=rrange(18,65),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.3||y>5.2)continue;let scale=rrange(.78,1.35),le=rrange(1,2.2),h=5.3*scale;let lx=Math.cos(a)*le*.5,lz=Math.sin(a)*le*.5;
+m.cyl(x,y,z,y+h,.36*scale,.23*scale,[.42,.27,.13],7,lx,lz);
+let tx=x+lx,tz=z+lz,ty=y+h;
+for(let f=0;f<8;f++){let angle=f*2*PI/8+rrange(-.14,.14),len=rrange(2.3,3.7)*scale,dx=Math.cos(angle),dz=Math.sin(angle);let c=[.15+rrange(0,.08),.39+rrange(0,.09),.18];let start=[tx,ty+.17,tz],mid=[tx+dx*len*.46,ty+.65,tz+dz*len*.46],end=[tx+dx*len,ty-len*.18,tz+dz*len],side=[-dz*.48*scale,0,dx*.48*scale];m.tri(start,add(mid,side),mid,c);m.tri(start,mid,sub(mid,side),c);m.tri(mid,add(mid,side),end,c);m.tri(mid,end,sub(mid,side),c);}
+for(let f=0;f<3;f++){let off=f*PI*2/3;m.orb(tx+Math.cos(off)*.35,ty-.35,tz+Math.sin(off)*.35,.29*scale,[.39,.28,.13]);}trees.push({x,z,scale});}
+for(let k=0;k<34;k++){let a=rrange(0,2*PI),r=rrange(2,68),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.1)continue;let sz=rrange(.45,1.4);m.orb(x,y+sz*.4,z,sz,[.39,.40,.38]);rocks.push({x,z,sz});}
+for(let k=0;k<250;k++){let x=rrange(-65,65),z=rrange(-65,65),y=height(x,z);if(y<1.5)continue;let sz=rrange(.17,.46);let g=[.32,.50,.24];m.tri([x,y,z],[x+sz,y+sz*2,z+sz*.1],[x+sz*.5,y,z+sz*.4],g);m.tri([x,y,z],[x-sz,y+sz*1.8,z-sz*.2],[x-sz*.5,y,z-sz*.4],g);}
+for(let i=0;i<83;i++){let a=rrange(0,2*PI),r=rrange(5,66),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.25)continue;let types=['stone','wood','fiber','coconut'],type=types[i%4];let item={id:i,type,x,z,y,active:true,cooldown:0};resources.push(item);}
+worldMesh=m.finish();}
+const recipes=[{key:'knife',name:'Stone knife',need:{stone:1,fiber:1},label:'Cutting tool'},{key:'axe',name:'Stone axe',need:{stone:2,wood:1,fiber:2},label:'A basic survival axe'},{key:'campfire',name:'Campfire',need:{stone:3,wood:3},label:'A permanent landmark'},{key:'shelter',name:'Lean-to shelter',need:{wood:4,fiber:4},label:'A place to rest'}];
+function itemMesh(type){let m=meshBuilder();if(type==='stone'){m.orb(0,.28,0,.41,[.52,.53,.48]);m.orb(.17,.16,.05,.19,[.59,.60,.55]);}if(type==='wood'){m.cyl(-.48,.18,0,.24,.19,.2,[.43,.27,.11],6,.96,0);m.box(0,.18,0,.86,.15,.29,[.45,.30,.16]);}if(type==='fiber'){for(let i=0;i<6;i++){let a=i*PI/3;m.tri([0,.06,0],[Math.cos(a)*.28,.52,Math.sin(a)*.28],[Math.cos(a+.35)*.30,.04,Math.sin(a+.35)*.30],[.25,.55,.21]);}}if(type==='coconut'){m.orb(0,.45,0,.45,[.33,.24,.13]);m.orb(.22,.48,.06,.1,[.39,.30,.16]);}return m.finish()}
+const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;uniform mat4 uVP;uniform vec3 uTranslation;uniform vec3 uCamera;uniform float uTime;uniform float uIsWater;varying vec3 vColor;varying vec3 vPosition;varying float vLight;void main(){vec3 pos=aPosition+uTranslation;if(uIsWater>0.5){pos.y+=sin(pos.x*.23+uTime*1.3)*.12+cos(pos.z*.19-uTime*1.5)*.11;}vPosition=pos;vColor=aColor;vLight=.74+max(0.,dot(normalize(aNormal),normalize(vec3(.53,1.,.26))))*.26;gl_Position=uVP*vec4(pos,1.);}`;
+const frag=`precision highp float;varying vec3 vColor;varying vec3 vPosition;varying float vLight;uniform vec3 uCamera;uniform float uIsWater;uniform float uTime;uniform float uNight;void main(){vec3 c=vColor*vLight;if(uIsWater>0.5){float w=sin(vPosition.x*.36+uTime)*cos(vPosition.z*.27-uTime*.6);c+=vec3(.025,.075,.10)*w;}float dist=length(vPosition-uCamera);float fog=smoothstep(70.,166.,dist)*.75;c=mix(c,vec3(.59,.76,.83),fog);c*=1.-uNight*.43;gl_FragColor=vec4(c,1.);}`;
+function shader(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(sh));return sh;}
+let prog;try{prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,vert));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,frag));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(prog));}catch(e){document.querySelector('#menu .panel p').textContent='WebGL failed to start: '+e.message;return;}
+gl.useProgram(prog);const attributes={p:gl.getAttribLocation(prog,'aPosition'),n:gl.getAttribLocation(prog,'aNormal'),c:gl.getAttribLocation(prog,'aColor')};const uniforms={vp:gl.getUniformLocation(prog,'uVP'),tr:gl.getUniformLocation(prog,'uTranslation'),cam:gl.getUniformLocation(prog,'uCamera'),time:gl.getUniformLocation(prog,'uTime'),water:gl.getUniformLocation(prog,'uIsWater'),night:gl.getUniformLocation(prog,'uNight')};
+function gpu(mesh){let result={count:mesh.count};for(let [name,arr] of [['p',mesh.v],['n',mesh.n],['c',mesh.c]]){let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);result[name]=b;}return result;}
+function bindDraw(obj,tr=[0,0,0],isWater=0){gl.uniform3f(uniforms.tr,...tr);gl.uniform1f(uniforms.water,isWater);for(let name of ['p','n','c']){gl.bindBuffer(gl.ARRAY_BUFFER,obj[name]);gl.enableVertexAttribArray(attributes[name]);gl.vertexAttribPointer(attributes[name],3,gl.FLOAT,false,0,0);}gl.drawArrays(gl.TRIANGLES,0,obj.count);}
+function perspective(fovy,aspect,near,far){let f=1/Math.tan(fovy/2),o=new Float32Array(16);o[0]=f/aspect;o[5]=f;o[10]=(far+near)/(near-far);o[11]=-1;o[14]=(2*far*near)/(near-far);return o;}
+function lookAt(eye,target){let f=norm(sub(target,eye)),s=norm(cross(f,[0,1,0])),u=cross(s,f),o=new Float32Array(16);o[0]=s[0];o[1]=u[0];o[2]=-f[0];o[4]=s[1];o[5]=u[1];o[6]=-f[1];o[8]=s[2];o[9]=u[2];o[10]=-f[2];o[12]=-s[0]*eye[0]-s[1]*eye[1]-s[2]*eye[2];o[13]=-u[0]*eye[0]-u[1]*eye[1]-u[2]*eye[2];o[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];o[15]=1;return o;}
+function multiply(a,b){let o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let sum=0;for(let k=0;k<4;k++)sum+=a[k*4+j]*b[i*4+k];o[i*4+j]=sum;}return o;}
+let staticTerrain,staticWater,staticWorld,itemGpu={},structureGpu={};
+function rebuildWorld(){spawnWorld();if(staticTerrain)for(let obj of [staticTerrain,staticWorld]){for(let name of ['p','n','c'])gl.deleteBuffer(obj[name]);}staticTerrain=gpu(buildTerrain());staticWorld=gpu(worldMesh);if(!staticWater)staticWater=gpu(buildWater());for(let type of ['stone','wood','fiber','coconut'])if(!itemGpu[type])itemGpu[type]=gpu(itemMesh(type));}
+const state={x:3,z:48,y:height(3,48)+1.7,vy:0,yaw:2.8,pitch:-.09,hp:100,hunger:92,thirst:82,time:320,day:1,bag:{stone:0,wood:0,fiber:0,coconut:0,knife:0,axe:0},campfire:false,shelter:false,campfirePos:null,shelterPos:null,started:false};
+let loaded=false,session=0,elapsed=0,toastTimeout=0,toastText='',latestItem=null,activeModal='menu',paused=true,helpTimer=0;
+function save(){try{const v={version:1,seed:worldSeed,state:{...state,bag:{...state.bag}},collected:resources.filter(r=>!r.active).map(r=>({id:r.id,cooldown:r.cooldown}))};localStorage.setItem(SAVE,JSON.stringify(v));toast('Game saved on this device');return true;}catch(e){toast('Save unavailable: browser storage blocked');return false;}}
+function load(){let raw;try{raw=localStorage.getItem(SAVE)}catch(e){return false}if(!raw)return false;try{let d=JSON.parse(raw);if(d.version!==1||!d.state)return false;worldSeed=d.seed||12345;rebuildWorld();Object.assign(state,d.state);state.bag={stone:0,wood:0,fiber:0,coconut:0,knife:0,axe:0,...d.state.bag};for(let r of (d.collected||[])){let item=resources.find(i=>i.id===r.id);if(item){item.active=false;item.cooldown=+r.cooldown||15;}}loaded=true;return true;}catch(e){console.warn('Save read failed',e);return false;}}
+function reset(){try{localStorage.removeItem(SAVE)}catch(e){}worldSeed=Math.floor(Math.random()*1e9)+1;rebuildWorld();Object.assign(state,{x:3,z:48,y:height(3,48)+1.7,vy:0,yaw:2.8,pitch:-.09,hp:100,hunger:92,thirst:82,time:320,day:1,bag:{stone:0,wood:0,fiber:0,coconut:0,knife:0,axe:0},campfire:false,shelter:false,campfirePos:null,shelterPos:null,started:false});loaded=false;save();}
+function toast(msg){let el=$('toast');el.textContent=msg;el.style.opacity=1;toastTimeout=2.6;toastText=msg;}
+function modal(name){for(let n of ['menu','inventory','craft','pause'])$(n).classList.add('hidden');activeModal=name||'';paused=!!name;if(name){$(name).classList.remove('hidden');if(name==='inventory')updateInventory();if(name==='craft')updateRecipes();}}
+function start(){state.started=true;modal('');toast('Gather stones, wood, fiber, and coconuts.');$('helpHint').style.display='block';helpTimer=9;}
+function updateInventory(){let b=state.bag;$('invGrid').innerHTML=Object.entries(b).map(([k,v])=>`<div>${k.toUpperCase()}<b>${v}</b></div>`).join('');$('drinkBtn').disabled=b.coconut<1;$('eatBtn').disabled=b.coconut<1;}
+function updateRecipes(){$('recipes').innerHTML=recipes.map((r,i)=>{let need=Object.entries(r.need).map(([k,v])=>`${v} ${k}`).join(' · '),can=Object.entries(r.need).every(([k,v])=>state.bag[k]>=v)&&!(r.key==='campfire'&&state.campfire)&&!(r.key==='shelter'&&state.shelter);return `<div class="recipe"><div><b>${r.name}</b><small>${r.label} · ${need}</small></div><button data-recipe="${i}" ${can?'':'disabled'}>${((r.key==='campfire'&&state.campfire)||(r.key==='shelter'&&state.shelter))?'BUILT':'MAKE'}</button></div>`;}).join('');}
+function craft(i){let r=recipes[i];if(!r)return;if(!Object.entries(r.need).every(([k,v])=>state.bag[k]>=v)){toast('Not enough resources');return;}if(r.key==='campfire'&&state.campfire||r.key==='shelter'&&state.shelter)return;for(let [k,v] of Object.entries(r.need))state.bag[k]-=v;if(r.key==='knife'||r.key==='axe')state.bag[r.key]++;else {state[r.key]=true;state[r.key+'Pos']=[state.x+Math.sin(state.yaw)*2.2,state.z+Math.cos(state.yaw)*2.2];}toast('Crafted '+r.name);updateRecipes();save();}
+function consume(what){if(!state.bag.coconut){toast('Find a coconut beneath a palm tree');return}state.bag.coconut--;if(what==='drink')state.thirst=clamp(state.thirst+37,0,100);else state.hunger=clamp(state.hunger+26,0,100);toast(what==='drink'?'Refreshing coconut water!':'Coconut eaten');updateInventory();save();}
+function action(){if(paused)return;if(!latestItem){toast('Move closer to a resource');return;}let r=latestItem;r.active=false;r.cooldown=180;state.bag[r.type]++;toast('Picked up '+r.type);}
+function nearestResource(){let best=null,bestDist=3.4;for(let r of resources){if(!r.active)continue;let d=Math.hypot(state.x-r.x,state.z-r.z);if(d<bestDist){best=r;bestDist=d;}}return best;}
+const joy={x:0,y:0,pid:-1},knob=$('knob');let lookPid=-1,lastLookX=0,lastLookY=0,runHeld=false,jumpRequested=false;
+function joyPointer(e){if(joy.pid!==-1&&e.pointerId!==joy.pid)return;joy.pid=e.pointerId;$('joy').setPointerCapture(e.pointerId);moveJoy(e);}
+function moveJoy(e){let rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2,dx=e.clientX-cx,dy=e.clientY-cy,len=Math.max(1,Math.hypot(dx,dy)),rad=rect.width*.33,scale=Math.min(1,rad/len);joy.x=dx*scale/rad;joy.y=dy*scale/rad;knob.style.transform=`translate(${dx*scale}px,${dy*scale}px)`;}
+$('joy').addEventListener('pointerdown',joyPointer);$('joy').addEventListener('pointermove',e=>{if(e.pointerId===joy.pid)moveJoy(e)});function joyEnd(e){if(e.pointerId!==joy.pid)return;joy.pid=-1;joy.x=0;joy.y=0;knob.style.transform='';}for(let ev of ['pointercancel','pointerup','lostpointercapture'])$('joy').addEventListener(ev,joyEnd);
+$('lookZone').addEventListener('pointerdown',e=>{if(lookPid!==-1)return;lookPid=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;$('lookZone').setPointerCapture(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookPid||paused)return;let dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;state.yaw+=dx*.005;state.pitch=clamp(state.pitch-dy*.0045,-1.27,1.27);lastLookX=e.clientX;lastLookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookPid)lookPid=-1;});
+$('actJump').addEventListener('pointerdown',e=>{e.preventDefault();jumpRequested=true});$('actCollect').addEventListener('click',action);$('actRun').addEventListener('pointerdown',()=>runHeld=true);for(let e of ['pointerup','pointercancel','pointerleave'])$('actRun').addEventListener(e,()=>runHeld=false);
+$('invBtn').onclick=()=>modal('inventory');$('craftBtn').onclick=()=>modal('craft');$('pauseBtn').onclick=()=>modal('pause');$('startBtn').onclick=start;$('saveBtn').onclick=save;
+$('resetBtn').onclick=()=>{if(window.confirm('Delete the saved world and start a new one?')){reset();start();}};
+$('backupBtn').onclick=()=>{if(!save())return;const data=localStorage.getItem(SAVE);const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Tidebreak-save-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('Backup downloaded. Keep it in Files.');};
+$('restoreFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{let txt=await f.text(),data=JSON.parse(txt);if(data.version!==1||!data.state||!data.state.bag||!Number.isFinite(data.state.x)||!Number.isFinite(data.state.z))throw Error('Invalid save format');if(!confirm('Replace your current world with this backup?'))return;localStorage.setItem(SAVE,txt);if(!load())throw Error('Could not restore game');toast('Backup restored');modal('pause');}catch(err){toast('Restore failed: '+err.message)}finally{e.target.value=''}});
+for(let el of document.querySelectorAll('.closeBtn'))el.onclick=()=>modal('');$('drinkBtn').onclick=()=>consume('drink');$('eatBtn').onclick=()=>consume('eat');$('recipes').addEventListener('click',e=>{let btn=e.target.closest('[data-recipe]');if(btn)craft(+btn.dataset.recipe);});
+let keys={};document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.code==='Space')jumpRequested=true;if(e.code==='KeyE')action();if(e.code==='KeyI')modal(paused?'':'inventory');if(e.code==='KeyC')modal(paused?'':'craft');if(e.code==='Escape')modal(paused?'':'pause');});document.addEventListener('keyup',e=>keys[e.code]=false);
+let lastButtons={};function controller(dt){let arr=navigator.getGamepads?navigator.getGamepads():[],p=Array.from(arr||[]).find(x=>x&&x.connected);if(!p)return [0,0];let axes=p.axes||[],lookX=Math.abs(axes[2]||0)>.16?axes[2]:0,lookY=Math.abs(axes[3]||0)>.16?axes[3]:0;state.yaw+=lookX*dt*2.4;state.pitch=clamp(state.pitch-lookY*dt*2.2,-1.27,1.27);let map={0:()=>jumpRequested=true,1:()=>modal(paused?'':'inventory'),2:action,3:()=>modal(paused?'':'craft'),9:()=>modal(paused?'':'pause')};for(let [k,fn] of Object.entries(map)){let now=!!(p.buttons[k]&&p.buttons[k].pressed);if(now&&!lastButtons[k])fn();lastButtons[k]=now;}runHeld=!!(p.buttons[10]&&p.buttons[10].pressed);return [Math.abs(axes[0]||0)>.13?axes[0]:0,Math.abs(axes[1]||0)>.13?axes[1]:0];}
+function jump(){if(state.y<=Math.max(height(state.x,state.z),.1)+1.72){state.vy=5.7;}}
+function update(dt){let gp=controller(dt);if(paused)return;session+=dt;elapsed+=dt;state.time+=dt*1.9;if(state.time>1440){state.time-=1440;state.day++;}state.hunger=clamp(state.hunger-dt*.045,0,100);state.thirst=clamp(state.thirst-dt*.065,0,100);if(state.hunger<=0||state.thirst<=0)state.hp=clamp(state.hp-dt*.8,0,100);else if(state.hp<100&&state.hunger>40&&state.thirst>40)state.hp=clamp(state.hp+dt*.06,0,100);
+if(!state.hp){modal('pause');toast('You passed out. Start a new world to try again.');}
+let mx=joy.x+gp[0]+(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=-joy.y-gp[1]+(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);let len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}let fast=runHeld||keys.ShiftLeft,speed=fast?6.1:3.35;let dx=(Math.cos(state.yaw)*mx+Math.sin(state.yaw)*mz)*speed*dt,dz=(-Math.sin(state.yaw)*mx+Math.cos(state.yaw)*mz)*speed*dt;
+let nx=state.x+dx,nz=state.z+dz,edge=Math.hypot(nx,nz);if(edge<87){let ground=height(nx,nz);if(ground>-.65){state.x=nx;state.z=nz;}}
+if(keys.ArrowLeft)state.yaw-=dt*1.6;if(keys.ArrowRight)state.yaw+=dt*1.6;
+let targetY=Math.max(height(state.x,state.z),.04)+1.7;
+if(jumpRequested){jump();jumpRequested=false;}
+state.vy-=12*dt;state.y+=state.vy*dt;if(state.y<targetY){state.y=targetY;state.vy=0;}
+for(let r of resources){if(!r.active){r.cooldown-=dt;if(r.cooldown<=0){r.active=true;r.cooldown=0;}}}
+latestItem=nearestResource();$('pickupHint').style.display=latestItem?'block':'none';$('pickupHint').textContent=latestItem?'Nearby: '+latestItem.type:'';
+$('hp').style.width=state.hp+'%';$('hunger').style.width=state.hunger+'%';$('thirst').style.width=state.thirst+'%';$('status').textContent=`DAY ${state.day} · ${Math.floor(state.time/60).toString().padStart(2,'0')}:${Math.floor(state.time%60).toString().padStart(2,'0')} · ${state.campfire?'Fire lit':'Explore the island'}`;
+if(toastTimeout>0){toastTimeout-=dt;if(toastTimeout<=0)$('toast').style.opacity=0;}if(helpTimer>0){helpTimer-=dt;if(helpTimer<=0)$('helpHint').style.display='none';}if(elapsed>25){elapsed=0;try{localStorage.setItem(SAVE,JSON.stringify({version:1,seed:worldSeed,state:{...state,bag:{...state.bag}},collected:resources.filter(r=>!r.active).map(r=>({id:r.id,cooldown:r.cooldown}))}))}catch(e){}}
+}
+function resize(){let dpr=Math.min(window.devicePixelRatio||1,1.45);let w=Math.max(1,Math.floor(window.innerWidth*dpr)),h=Math.max(1,Math.floor(window.innerHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}}
+let lastTime=0,animationTime=0;
+function render(now){requestAnimationFrame(render);let dt=lastTime?clamp((now-lastTime)/1000,0,.04):.016;lastTime=now;resize();update(dt);animationTime+=dt;
+let sun=Math.sin((state.time/1440)*PI*2),night=clamp((-sun+.08)*.75,0,.65);$('shade').style.opacity=(night*.72).toFixed(3);
+let c=[state.x,state.y,state.z],look=[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)],p=perspective(PI/2.8,canvas.width/canvas.height,.1,177),v=lookAt(c,add(c,look));gl.useProgram(prog);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uniforms.vp,false,multiply(p,v));gl.uniform3f(uniforms.cam,...c);gl.uniform1f(uniforms.time,animationTime);gl.uniform1f(uniforms.night,night);
+bindDraw(staticWater,[0,0,0],1);bindDraw(staticTerrain);bindDraw(staticWorld);
+for(let r of resources){if(!r.active)continue;let d=Math.hypot(r.x-state.x,r.z-state.z);if(d>65)continue;bindDraw(itemGpu[r.type],[r.x,r.y+.06+Math.sin(animationTime*2+r.id)*.08,r.z]);}
+if(state.campfire){let m=structureGpu.fire;if(!m){let b=meshBuilder();for(let i=0;i<6;i++){let a=i*2*PI/6;b.box(Math.cos(a)*.9,.01,Math.sin(a)*.9,.7,.35,.6,[.42,.40,.37]);}b.cyl(0,.1,0,1.5,.27,.02,[.98,.45,.08],5);m=structureGpu.fire=gpu(b.finish());}let pos=state.campfirePos||[2,50];bindDraw(m,[pos[0],height(pos[0],pos[1]),pos[1]]);}
+if(state.shelter){let m=structureGpu.shelter;if(!m){let b=meshBuilder();b.box(0,0,0,2.7,.22,2.1,[.40,.27,.15]);for(let x of [-1.15,1.15])for(let z of [-.8,.8])b.cyl(x,.22,z,2.5,.13,.10,[.42,.29,.13]);b.quad([-1.5,2.4,-1.1],[1.5,2.4,-1.1],[1.5,1.5,1.1],[-1.5,1.5,1.1],[.38,.38,.18]);m=structureGpu.shelter=gpu(b.finish());}let pos=state.shelterPos||[6,50];bindDraw(m,[pos[0],height(pos[0],pos[1]),pos[1]]);}
+}
+rebuildWorld();if(load()){$('startBtn').textContent='CONTINUE SURVIVING';}else $('startBtn').textContent='START SURVIVING';$('helpHint').style.display='none';requestAnimationFrame(render);
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();if(state.started)save();});canvas.addEventListener('webglcontextrestored',()=>location.reload());window.addEventListener('pagehide',()=>{if(state.started)save();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.started)save();});
+if('serviceWorker' in navigator && location.protocol.startsWith('https'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
