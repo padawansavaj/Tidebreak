@@ -3,23 +3,21 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#114455" />
+<meta name="theme-color" content="#16587a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Tidebreak" />
 <meta name="description" content="An original, free first-person island-survival prototype, designed for mobile touch and controllers." />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/svg+xml" href="icon.svg" /><link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<title>TIDEBREAK • Island Survival Prototype</title>
+<title>TIDEBREAK • Realism Foundation v0.2.0</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f5f9fa}
 html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
-#sky{position:fixed;inset:0;pointer-events:none;background:
-  radial-gradient(ellipse 29% 10% at 72% 29%,rgba(255,255,232,.63),transparent 80%),
-  radial-gradient(ellipse 25% 8% at 16% 22%,rgba(255,255,255,.22),transparent 76%),
-  radial-gradient(ellipse 23% 7% at 64% 15%,rgba(255,255,255,.18),transparent 75%),
-  linear-gradient(180deg,#4586b8 0%,#72b2d5 30%,#b7dbe2 58%,#f9d5a5 78%,#c9dcce 100%);}
+#sky{position:fixed;inset:0;pointer-events:none;background:#6db1ce url("assets/sky.webp") 51% 46%/auto 100% repeat-x;will-change:filter,background-position}
+#sky:after{content:"";position:absolute;inset:43% 0 0;background:linear-gradient(180deg,transparent 0%,rgba(165,214,216,.25) 54%,rgba(243,220,180,.43) 100%)}
+#nightStars{position:fixed;inset:0;pointer-events:none;opacity:0;background-image:radial-gradient(1px 1px at 7% 12%,#fff 99%,transparent),radial-gradient(1px 1px at 23% 33%,#fff 99%,transparent),radial-gradient(2px 2px at 48% 15%,#fff 99%,transparent),radial-gradient(1px 1px at 61% 31%,#fff 99%,transparent),radial-gradient(1px 1px at 84% 7%,#fff 99%,transparent),radial-gradient(1px 1px at 93% 25%,#fff 99%,transparent);z-index:0}
 #game{position:fixed;inset:0;width:100%;height:100%;display:block;background:transparent}
 #shade{pointer-events:none;position:fixed;inset:0;background:#03172e;opacity:0;z-index:1}
 #vignette{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 46%,rgba(0,16,30,.35) 100%);z-index:2}
@@ -52,18 +50,18 @@ html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:n
 </style>
 </head>
 <body>
-<div id="sky" aria-hidden="true"></div>
+<div id="sky" aria-hidden="true"></div><div id="nightStars" aria-hidden="true"></div>
 <canvas id="game" aria-label="3D island survival game"></canvas>
 <div id="shade"></div><div id="vignette"></div>
 <div id="hud">
-  <div id="stats"><div class="heading">TIDEBREAK <span style="font-size:9px;color:#a7d9da">ALPHA 0.1.2</span></div>
+  <div id="stats"><div class="heading">TIDEBREAK <span style="font-size:9px;color:#a7d9da">ALPHA 0.2.0</span></div>
     <div class="stat"><label>HEALTH</label><div class="meter"><span id="hp" style="width:100%"></span></div></div>
     <div class="stat"><label>FOOD</label><div class="meter"><span id="hunger" style="width:100%"></span></div></div>
     <div class="stat"><label>WATER</label><div class="meter"><span id="thirst" style="width:100%"></span></div></div>
     <div id="status">DAY 1 · Clear skies</div>
   </div>
   <div id="topButtons"><button class="ui" id="invBtn">BAG</button><button class="ui" id="craftBtn">CRAFT</button><button class="ui" id="pauseBtn">Ⅱ</button></div>
-  <div id="helpHint">Left thumb: move · Right side: look (horizontal inverted)</div><div id="reticle"></div><div id="pickupHint"></div><div id="toast"></div>
+  <div id="helpHint">Left thumb: move · Right side: look (direct swipe)</div><div id="reticle"></div><div id="pickupHint"></div><div id="toast"></div>
   <div id="lookZone" aria-label="Look around by dragging"></div>
   <div id="joy" aria-label="Movement thumbstick"><div id="knob"></div></div>
   <div id="actions"><button id="actJump" class="act">JUMP</button><button id="actRun" class="act">RUN</button><button id="actCollect" class="act">PICK UP</button></div>
@@ -72,10 +70,10 @@ html,body{margin:0;overflow:hidden;height:100%;background:#0e4256;touch-action:n
 <div id="menu" class="modal"><div class="panel">
   <div class="sub">A NEW ORIGINAL ISLAND SURVIVAL GAME</div><h1>TIDEBREAK</h1>
   <p>Shipwrecked on an isolated tropical island. Search the shore, gather supplies, manage hunger and thirst, and build your first survival tools.</p>
-  <p><strong>iPhone:</strong> left thumb moves · drag the right side to look (horizontal inverted) · PICK UP collects nearby items. <strong>Xbox controller:</strong> sticks move/look · A jumps · X collects · Y crafts · B opens bag.</p>
+  <p><strong>iPhone:</strong> left thumb moves · drag the right side to look (right = right) · PICK UP collects nearby items. <strong>Xbox controller:</strong> sticks move/look · A jumps · X collects · Y crafts · B opens bag.</p>
   <div id="startupStatus" aria-live="polite">Preparing game...</div>
   <div class="btnrow"><button id="startBtn" class="mainBtn">START SURVIVING</button><button id="resetBtn" class="outlineBtn">NEW WORLD</button></div>
-  <p class="warning">Free alpha prototype • No account, purchases, or external game engine required. Saves stay in this browser on this device. This is a browser game, not yet a native Xbox or App Store app.</p>
+  <p class="warning">v0.2.0 realism preview · optimized procedural models and original terrain textures • No account, purchases, or external game engine required. Saves stay in this browser on this device. This is a browser game, not yet a native Xbox or App Store app.</p>
 </div></div>
 <div id="inventory" class="modal hidden"><div class="panel"><h2>BACKPACK</h2><div class="inv" id="invGrid"></div><p>Collect resources nearby. Coconuts can be eaten or drunk. Tools and structures are made in the crafting menu.</p><div class="btnrow"><button class="mainBtn" id="drinkBtn">DRINK COCONUT</button><button class="outlineBtn" id="eatBtn">EAT COCONUT</button><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
 <div id="craft" class="modal hidden"><div class="panel"><h2>CRAFTING</h2><p>Use resources you pick up from the beach and island.</p><div id="recipes"></div><div class="btnrow"><button class="outlineBtn closeBtn">RETURN</button></div></div></div>
@@ -113,10 +111,10 @@ window.tidebreakFallback=function(reason){
  $('restoreFile').onchange=async e=>{try{let f=e.target.files[0];if(!f)return;let data=JSON.parse(await f.text());if(!data||data.version!==1||!data.state||!data.state.bag)throw Error('Invalid save');if(!confirm('Replace saved world with this backup?'))return;localStorage.setItem(SAVE,JSON.stringify(data));load();show('pause');toast('Backup restored');}catch(err){toast('Restore failed: '+err.message);}e.target.value='';};
  let joystick=$('joy'),knob=$('knob');joystick.addEventListener('pointerdown',e=>{joy.id=e.pointerId;joystick.setPointerCapture?.(e.pointerId);movejoy(e);});function movejoy(e){let r=joystick.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,rad=r.width*.33,k=Math.min(1,rad/(Math.hypot(dx,dy)||1));joy.x=dx*k/rad;joy.y=dy*k/rad;knob.style.transform=`translate(${dx*k}px,${dy*k}px)`;}
  joystick.addEventListener('pointermove',e=>{if(e.pointerId===joy.id)movejoy(e);});for(let ev of ['pointercancel','pointerup','lostpointercapture'])joystick.addEventListener(ev,e=>{if(e.pointerId===joy.id){joy.id=-1;joy.x=joy.y=0;knob.style.transform='';}});
- $('lookZone').addEventListener('pointerdown',e=>{if(lookId!==-1)return;lookId=e.pointerId;lookX=e.clientX;lookY=e.clientY;e.target.setPointerCapture?.(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookId||currentPanel)return;state.yaw-=(e.clientX-lookX)*.005;state.pitch=clamp(state.pitch-(e.clientY-lookY)*.0045,-1.27,1.27);lookX=e.clientX;lookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookId)lookId=-1;});
+ $('lookZone').addEventListener('pointerdown',e=>{if(lookId!==-1)return;lookId=e.pointerId;lookX=e.clientX;lookY=e.clientY;e.target.setPointerCapture?.(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookId||currentPanel)return;state.yaw+=(e.clientX-lookX)*.005;state.pitch=clamp(state.pitch-(e.clientY-lookY)*.0045,-1.27,1.27);lookX=e.clientX;lookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookId)lookId=-1;});
  $('actJump').addEventListener('pointerdown',()=>jump=true);$('actRun').addEventListener('pointerdown',()=>runHeld=true);for(let ev of ['pointerup','pointercancel','pointerleave'])$('actRun').addEventListener(ev,()=>runHeld=false);
  document.addEventListener('keydown',e=>{keyboard[e.code]=true;if(e.code==='Escape')show(currentPanel?'':'pause');if(e.code==='KeyE')pick();if(e.code==='Space')jump=true;if(e.code==='KeyI')show(currentPanel?'':'inventory');if(e.code==='KeyC')show(currentPanel?'':'craft');});document.addEventListener('keyup',e=>keyboard[e.code]=false);
- let lastButtons={};function controls(dt){let p=[...(navigator.getGamepads?.()||[])].find(v=>v&&v.connected);if(!p)return[0,0];let ax=p.axes||[],look=ax[2]||0;if(Math.abs(look)>.16)state.yaw-=look*2.4*dt;let ly=ax[3]||0;if(Math.abs(ly)>.16)state.pitch=clamp(state.pitch-ly*2.2*dt,-1.27,1.27);let map={0:()=>jump=true,1:()=>show(currentPanel?'':'inventory'),2:pick,3:()=>show(currentPanel?'':'craft'),9:()=>show(currentPanel?'':'pause')};for(let [i,fn]of Object.entries(map)){let pressed=!!p.buttons[i]?.pressed;if(pressed&&!lastButtons[i])fn();lastButtons[i]=pressed;}return[Math.abs(ax[0]||0)>.14?ax[0]:0,Math.abs(ax[1]||0)>.14?ax[1]:0];}
+ let lastButtons={};function controls(dt){let p=[...(navigator.getGamepads?.()||[])].find(v=>v&&v.connected);if(!p)return[0,0];let ax=p.axes||[],look=ax[2]||0;if(Math.abs(look)>.16)state.yaw+=look*2.4*dt;let ly=ax[3]||0;if(Math.abs(ly)>.16)state.pitch=clamp(state.pitch-ly*2.2*dt,-1.27,1.27);let map={0:()=>jump=true,1:()=>show(currentPanel?'':'inventory'),2:pick,3:()=>show(currentPanel?'':'craft'),9:()=>show(currentPanel?'':'pause')};for(let [i,fn]of Object.entries(map)){let pressed=!!p.buttons[i]?.pressed;if(pressed&&!lastButtons[i])fn();lastButtons[i]=pressed;}return[Math.abs(ax[0]||0)>.14?ax[0]:0,Math.abs(ax[1]||0)>.14?ax[1]:0];}
  function resize(){let dpr=Math.min(devicePixelRatio||1,1.3),w=Math.max(1,Math.round(innerWidth*dpr)),h=Math.max(1,Math.round(innerHeight*dpr));if(screen.width!==w||screen.height!==h){screen.width=w;screen.height=h;ctx.setTransform(dpr,0,0,dpr,0,0);} }
  function projection(x,y,z,w,h){let dx=x-state.x,dz=z-state.z, f=dx*Math.sin(state.yaw)+dz*Math.cos(state.yaw),r=dx*Math.cos(state.yaw)-dz*Math.sin(state.yaw);if(f<.7)return null;let focal=w*.78;return [w/2+r*focal/f,h*.54-(y-state.y)*focal/f+state.pitch*focal,f];}
  function draw(){resize();let w=innerWidth,h=innerHeight;let sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#4b93bb');sky.addColorStop(.5,'#c4d6c8');sky.addColorStop(1,'#216a80');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);let horizon=clamp(h*.54+state.pitch*w*.78,0,h);
@@ -125,7 +123,7 @@ window.tidebreakFallback=function(reason){
  polygons.sort((a,b)=>b.dist-a.dist);for(let p of polygons){ctx.beginPath();ctx.moveTo(p.v[0][0],p.v[0][1]);for(let i=1;i<4;i++)ctx.lineTo(p.v[i][0],p.v[i][1]);ctx.closePath();ctx.fillStyle=p.col;ctx.fill();}
  let objects=[...trees.map(t=>({x:t.x,z:t.z,h:t.h,type:'tree'})),...resources.filter(r=>r.active).map(r=>({...r,h:.6}))];objects.sort((a,b)=>Math.hypot(b.x-state.x,b.z-state.z)-Math.hypot(a.x-state.x,a.z-state.z));for(let o of objects){let base=projection(o.x,height(o.x,o.z),o.z,w,h),top=projection(o.x,height(o.x,o.z)+o.h,o.z,w,h);if(!base||!top||base[2]>95)continue;let size=Math.max(2,base[1]-top[1]),x=base[0],y=base[1];if(x<-120||x>w+120)continue;if(o.type==='tree'){ctx.strokeStyle='#6e5337';ctx.lineWidth=clamp(size*.09,1,15);ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+size*.08,y-size*.65,x+size*.12,y-size);ctx.stroke();for(let k=0;k<6;k++){let a=k*PI/3,ex=x+size*.12+Math.cos(a)*size*.51,ey=y-size+Math.sin(a)*size*.17;ctx.strokeStyle=k%2?'#286d3e':'#3a8a4c';ctx.lineWidth=clamp(size*.045,1,8);ctx.beginPath();ctx.moveTo(x+size*.12,y-size);ctx.quadraticCurveTo((x+ex)/2,ey-size*.21,ex,ey+size*.13);ctx.stroke();}}else{ctx.fillStyle={stone:'#aaaaa6',wood:'#a37747',fiber:'#69a65c',coconut:'#896341'}[o.type];ctx.beginPath();ctx.ellipse(x,y-size*.5,clamp(size*.65,2,22),clamp(size*.5,2,18),0,0,2*PI);ctx.fill();}}
  }
- function tick(time){requestAnimationFrame(tick);if(time-last<30)return;let dt=Math.min((time-last)/1000||.033,.06);last=time;let gamepad=controls(dt);if(running&&!currentPanel){seconds+=dt;state.time+=dt*1.9;if(state.time>1440){state.time-=1440;state.day++;}state.hunger=clamp(state.hunger-dt*.045,0,100);state.thirst=clamp(state.thirst-dt*.065,0,100);if(!state.hunger||!state.thirst)state.hp=clamp(state.hp-dt*.8,0,100);let x=joy.x+gamepad[0]+(keyboard.KeyD?1:0)-(keyboard.KeyA?1:0),z=-joy.y-gamepad[1]+(keyboard.KeyW?1:0)-(keyboard.KeyS?1:0),n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}let speed=(runHeld||keyboard.ShiftLeft)?6:3.35,nx=state.x+(Math.cos(state.yaw)*x+Math.sin(state.yaw)*z)*dt*speed,nz=state.z+(-Math.sin(state.yaw)*x+Math.cos(state.yaw)*z)*dt*speed;if(Math.hypot(nx,nz)<87&&height(nx,nz)>-.65){state.x=nx;state.z=nz;}if(keyboard.ArrowLeft)state.yaw+=dt*1.6;if(keyboard.ArrowRight)state.yaw-=dt*1.6;let floor=height(state.x,state.z)+1.7;if(jump&&state.y<=floor+.1){state.vy=5.7;jump=false;}state.vy-=12*dt;state.y+=state.vy*dt;if(state.y<floor){state.y=floor;state.vy=0;}latest=null;let min=3.4;for(let r of resources){if(!r.active){r.cooldown-=dt;if(r.cooldown<=0)r.active=true;}else{let d=Math.hypot(r.x-state.x,r.z-state.z);if(d<min){latest=r;min=d;}}}if(seconds>20){seconds=0;save(true);}}
+ function tick(time){requestAnimationFrame(tick);if(time-last<30)return;let dt=Math.min((time-last)/1000||.033,.06);last=time;let gamepad=controls(dt);if(running&&!currentPanel){seconds+=dt;state.time+=dt*1.9;if(state.time>1440){state.time-=1440;state.day++;}state.hunger=clamp(state.hunger-dt*.045,0,100);state.thirst=clamp(state.thirst-dt*.065,0,100);if(!state.hunger||!state.thirst)state.hp=clamp(state.hp-dt*.8,0,100);let x=joy.x+gamepad[0]+(keyboard.KeyD?1:0)-(keyboard.KeyA?1:0),z=-joy.y-gamepad[1]+(keyboard.KeyW?1:0)-(keyboard.KeyS?1:0),n=Math.hypot(x,z);if(n>1){x/=n;z/=n;}let speed=(runHeld||keyboard.ShiftLeft)?6:3.35,nx=state.x+(Math.cos(state.yaw)*x+Math.sin(state.yaw)*z)*dt*speed,nz=state.z+(-Math.sin(state.yaw)*x+Math.cos(state.yaw)*z)*dt*speed;if(Math.hypot(nx,nz)<87&&height(nx,nz)>-.65){state.x=nx;state.z=nz;}if(keyboard.ArrowLeft)state.yaw-=dt*1.6;if(keyboard.ArrowRight)state.yaw+=dt*1.6;let floor=height(state.x,state.z)+1.7;if(jump&&state.y<=floor+.1){state.vy=5.7;jump=false;}state.vy-=12*dt;state.y+=state.vy*dt;if(state.y<floor){state.y=floor;state.vy=0;}latest=null;let min=3.4;for(let r of resources){if(!r.active){r.cooldown-=dt;if(r.cooldown<=0)r.active=true;}else{let d=Math.hypot(r.x-state.x,r.z-state.z);if(d<min){latest=r;min=d;}}}if(seconds>20){seconds=0;save(true);}}
  $('pickupHint').style.display=latest&&running?'block':'none';$('pickupHint').textContent=latest?'Nearby: '+latest.type:'';$('hp').style.width=state.hp+'%';$('hunger').style.width=state.hunger+'%';$('thirst').style.width=state.thirst+'%';$('status').textContent=`DAY ${state.day} · ${Math.floor(state.time/60).toString().padStart(2,'0')}:${Math.floor(state.time%60).toString().padStart(2,'0')} · Low-graphics mode`;
  draw();}
  build();if(load())$('startBtn').textContent='CONTINUE SURVIVING';$('helpHint').style.display='none';requestAnimationFrame(tick);
@@ -157,61 +155,239 @@ function cyl(x,y,z,topY,r1,r2,color,segments=7,dx=0,dz=0){for(let i=0;i<segments
 function box(x,y,z,w,h,d,col){let a=V(x-w/2,y,z-d/2),b=V(x+w/2,y,z-d/2),cc=V(x+w/2,y+h,z-d/2),dd=V(x-w/2,y+h,z-d/2),e=V(x-w/2,y,z+d/2),f=V(x+w/2,y,z+d/2),g=V(x+w/2,y+h,z+d/2),hh=V(x-w/2,y+h,z+d/2);quad(a,b,cc,dd,col);quad(f,e,hh,g,col);quad(e,a,dd,hh,col);quad(b,f,g,cc,col);quad(dd,cc,g,hh,col);quad(e,f,b,a,col)}
 function orb(x,y,z,r,col){let pts=[[0,1,0],[1,0,0],[0,0,1],[-1,0,0],[0,0,-1],[0,-1,0]].map(p=>[x+p[0]*r,y+p[1]*r,z+p[2]*r]);for(let [i,j,k] of [[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]])tri(pts[i],pts[j],pts[k],col)}
 function finish(){return {v:new Float32Array(v),n:new Float32Array(n),c:new Float32Array(c),count:v.length/3}}return{tri,triSmooth,quad,quadSmooth,cyl,box,orb,finish};}
+// Island realism primitives: faceted natural rock, softly rounded coconuts, and curved leaflets.
+function addBoulder(m,x,y,z,s,rot=0){
+ const rings=[[.10,.34],[.52,.96],[.86,.84],[1.06,.37]],K=10;
+ for(let k=0;k<rings.length-1;k++)for(let j=0;j<K;j++){
+   let verts=[];for(let [ring,ang] of [[k,j],[k,j+1],[k+1,j+1],[k+1,j]]){
+     const t=ang*2*PI/K+rot,rr=rings[ring][1],ir=.88+.14*Math.sin(ang*3.37+ring*1.9+rot*2),sy=rings[ring][0];
+     verts.push([x+Math.cos(t)*rr*s*ir,y+sy*s,z+Math.sin(t)*rr*s*ir]);
+   }
+   let tone=.88+.12*Math.sin(j*2.3+rot)+.07*Math.sin(k*5.4),c=[.46*tone,.48*tone,.44*tone];
+   m.quad(...verts,c);
+ }
+ const top=[x,y+1.13*s,z];for(let j=0;j<K;j++){
+    let a=j*2*PI/K+rot,b=(j+1)*2*PI/K+rot;
+    m.tri([x+Math.cos(a)*.37*s,y+1.06*s,z+Math.sin(a)*.37*s],[x+Math.cos(b)*.37*s,y+1.06*s,z+Math.sin(b)*.37*s],top,[.52,.53,.48]);
+ }
+}
+function addPalm(m,t,i){
+ const s=t.scale, x=t.x,z=t.z,y=height(x,z),angle=i*2.39996+worldSeed*.001;
+ const h=(7.9+(i%7)*.39)*s,lean=1.0+.17*(i%4),bendX=Math.cos(angle)*lean,bendZ=Math.sin(angle)*lean;
+ const pos=f=>[x+bendX*f*f,y+h*f,z+bendZ*f*f];
+ const segCount=8;
+ for(let j=0;j<segCount;j++){
+  let f=j/segCount,g=(j+1)/segCount,a=pos(f),b=pos(g),rad=(.33-.15*f)*s,next=(.33-.15*g)*s;
+  let tint=.9+.09*Math.sin(i*11+j*3.1);
+  m.cyl(a[0],a[1],a[2],b[1],rad,next,[.38*tint,.295*tint,.21*tint],10,b[0]-a[0],b[2]-a[2]);
+  // discontinuous bark ridges catch sunlight without needing hundreds of polygons
+  let scars= (j%2===0?2:1);
+  for(let q=0;q<scars;q++){let u=f+(q+.4)/scars/segCount,pp=pos(u),rr=(.33-.15*u)*s;
+     m.cyl(pp[0],pp[1],pp[2],pp[1]+.028*s,rr*1.024,rr*1.018,[.29*tint,.23*tint,.165*tint],9);}
+ }
+ // Stilted buttress roots
+ for(let k=0;k<4;k++){let a=angle+k*PI/2;m.cyl(x,y+.04,z,y+.64*s,.08*s,.21*s,[.34,.27,.18],6,Math.cos(a)*.75*s,Math.sin(a)*.75*s);}
+ const crown=pos(1), count=9+(i%4);
+ for(let f=0;f<count;f++){
+  let a=2*PI*f/count+angle*.16,dir=[Math.cos(a),Math.sin(a)];let length=(3.1+.37*((f*11+i)%5))*s;
+  const path=t=>[crown[0]+dir[0]*length*t,crown[1]+.5*Math.sin(PI*t)*s-(.9+f%3*.15)*t*t*s,crown[2]+dir[1]*length*t];
+  const vright=[-dir[1],0,dir[0]],steps=12;
+  for(let j=0;j<steps;j++){
+    let t=j/steps,t2=(j+1)/steps,mid=(t+t2)/2,root=path(t),end=path(t2),p=path(mid);
+    let wid=Math.sin(Math.PI*mid)*(.64+.06*(f%3))*s;let edgeL=[p[0]+vright[0]*wid,p[1]-.19*s,p[2]+vright[2]*wid];
+    let edgeR=[p[0]-vright[0]*wid,p[1]-.19*s,p[2]-vright[2]*wid];
+    let leafshade=(.85+.13*Math.sin(i*4.7+f*2.9+j));
+    m.tri(root,edgeL,end,[.19*leafshade,.40*leafshade,.16*leafshade]);
+    m.tri(root,end,edgeR,[.135*leafshade,.31*leafshade,.12*leafshade]);
+    // Individual alternating downward pointed leaflets, not flat slabs.
+    if(j>0&&j<steps-1){
+      let ln=.43*s*(1-t)+.20*s;
+      let ql=[p[0]+vright[0]*(wid+ln),p[1]-.35*s,p[2]+vright[2]*(wid+ln)];
+      let qr=[p[0]-vright[0]*(wid+ln),p[1]-.35*s,p[2]-vright[2]*(wid+ln)];
+      m.tri(root,ql,end,[.20,.45,.16]);m.tri(root,end,qr,[.135,.34,.13]);
+    }
+  }
+ }
+ for(let j=0;j<3;j++){let a=j*2*PI/3+angle;
+  m.orb(crown[0]+Math.cos(a)*.31*s,crown[1]-.36*s,crown[2]+Math.sin(a)*.31*s,.29*s,[.38,.31,.17]);
+ }
+}
+function addShrub(m,x,y,z,size,theta){
+ const center=[x,y+.10*size,z];
+ for(let k=0;k<6;k++){let a=theta+k*PI/3,dx=Math.cos(a),dz=Math.sin(a);
+   let stem=[x+dx*.22*size,y+.55*size,z+dz*.22*size],tip=[x+dx*.83*size,y+.34*size,z+dz*.83*size],left=[x+dx*.54*size-dz*.20*size,y+.50*size,z+dz*.54*size+dx*.20*size],right=[x+dx*.54*size+dz*.20*size,y+.50*size,z+dz*.54*size-dx*.20*size];
+   m.tri(center,stem,left,[.13,.31,.12]);m.tri(stem,tip,left,[.19,.43,.17]);m.tri(stem,right,tip,[.16,.36,.13]);
+ }
+}
 const smooth=(a,b,v)=>{let t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};
 const hash=(x,z)=>{let t=Math.sin(x*127.1+z*311.7)*43758.5453;return t-Math.floor(t)};
 function groundColor(x,z,h){let r=Math.hypot(x,z),v=hash(Math.floor(x*2),Math.floor(z*2));let s=.93+.13*v+.05*Math.sin(x*.33+z*.17);let sand=[.79*s,.70*s,.52*s],grass=[.235*s,.365*s,.205*s];let hill=[.29*s,.36*s,.205*s];let shore=smooth(-.5,3.05,h);let inland=smooth(2.4,6.3,h);let dry=smooth(1.5,4,h)*(1-smooth(4.4,6.8,h));let dirt=[.43*s,.355*s,.226*s];return sand.map((u,i)=>{let g=grass[i]*(1-inland)+hill[i]*inland;return u*(1-shore)+((1-dry*.18)*g+dry*.18*dirt[i])*shore;});}
 function terrainNormal(x,z){let d=.45;return norm([height(x-d,z)-height(x+d,z),2*d,height(x,z-d)-height(x,z+d)]);}
 function buildTerrain(){let m=meshBuilder(),s=1.7,N=112;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let xz=[[x,z],[x+s,z],[x+s,z+s],[x,z+s]];let pts=xz.map(q=>[q[0],height(...q),q[1]]);m.quadSmooth(...pts,pts.map(p=>groundColor(p[0],p[2],p[1])),pts.map(p=>terrainNormal(p[0],p[2])));}return m.finish()}
-function buildWater(){let m=meshBuilder(),N=68,s=6.1;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let col=[.06,.35,.47];m.quad([x,0,z],[x+s,0,z],[x+s,0,z+s],[x,0,z+s],col);}return m.finish()}
+function buildWater(){let m=meshBuilder(),N=80,s=5.4;for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){let x=i*s,z=j*s;let col=[.06,.35,.47];m.quad([x,0,z],[x+s,0,z],[x+s,0,z+s],[x,0,z+s],col);}return m.finish()}
 let resources=[], trees=[], rocks=[], worldMesh;
-function spawnWorld(){rngState=worldSeed;resources=[];trees=[];rocks=[];let m=meshBuilder();
-// Original seeded placements and random-call counts are preserved to keep v0.1 saves stable.
-for(let k=0;k<45;k++){let a=rrange(0,2*PI),r=rrange(18,65),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.3||y>5.2)continue;let scale=rrange(.78,1.35),le=rrange(1,2.2),h=5.3*scale,lx=Math.cos(a)*le*.5,lz=Math.sin(a)*le*.5;
-// Curved, segmented palms with varied bark tones.
-let segments=5;for(let seg=0;seg<segments;seg++){let t=seg/segments,t2=(seg+1)/segments,bx=x+lx*t*t,bz=z+lz*t*t,ex=x+lx*t2*t2,ez=z+lz*t2*t2;
-let hue=.95+.08*Math.sin(k*7.6+seg*1.1);m.cyl(bx,y+h*t,bz,y+h*t2,(.39-.13*t)*scale,(.37-.15*t2)*scale,[.38*hue,.29*hue,.18*hue],9,ex-bx,ez-bz);
-// Fine dark bark seams following the curvature.
-for(let stripe=0;stripe<3;stripe++){let theta=(stripe/3)*PI*2+seg*.22+k;let sx=bx+Math.cos(theta)*(.39-.13*t)*scale,sz=bz+Math.sin(theta)*(.39-.13*t)*scale;
-m.cyl(sx,y+h*t+.04,sz,y+h*t2-.05,.018*scale,.014*scale,[.27,.19,.115],4,ex-bx,ez-bz);}}
-let tx=x+lx,tz=z+lz,ty=y+h;
-for(let f=0;f<8;f++){let angle=f*2*PI/8+rrange(-.14,.14),len=rrange(2.3,3.7)*scale,dx=Math.cos(angle),dz=Math.sin(angle),shade=.15+rrange(0,.08),g=.39+rrange(0,.09);let leaf=[shade,g,.18],leafDark=[shade*.72,g*.71,.13],leafLit=[Math.min(.45,shade*1.5),Math.min(.7,g*1.25),.22];
-// Six curved frond segments, narrowing naturally toward the tip.
-function point(t){let arch=.68*Math.sin(Math.PI*t)-.48*t*t*len*.40;return [tx+dx*len*t,ty+.19+arch,tz+dz*len*t];}
-for(let seg=0;seg<6;seg++){let t=seg/6,t2=(seg+1)/6,mid=(t+t2)/2,width=Math.sin(Math.PI*(.055+.89*mid))*.46*scale*(1-.16*mid);let p0=point(t),p1=point(t2);let perp=[-dz,0,dx],center=point(mid);let left=add(center,perp.map(v=>v*width)),right=sub(center,perp.map(v=>v*width));m.tri(p0,left,p1,leafLit);m.tri(p0,p1,right,leafDark);
-// Slim alternating leaflets give palms a feathered silhouette.
-if(seg>=1&&seg<5){let tip=point(Math.min(1,mid+.21)),short=.9*scale*(1-mid*.38);let l=add(center,perp.map(v=>v*short)),rr=sub(center,perp.map(v=>v*short));l[1]-=.18*scale;rr[1]-=.18*scale;m.tri(center,l,tip,leaf);m.tri(center,tip,rr,leafDark);}}
-}for(let f=0;f<3;f++){let off=f*PI*2/3;m.orb(tx+Math.cos(off)*.35,ty-.35,tz+Math.sin(off)*.35,.29*scale,[.39,.28,.13]);}
-trees.push({x,z,scale});}
-for(let k=0;k<34;k++){let a=rrange(0,2*PI),r=rrange(2,68),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.1)continue;let sz=rrange(.45,1.4);m.orb(x,y+sz*.4,z,sz,[.43,.435,.405]);rocks.push({x,z,sz});}
-for(let k=0;k<250;k++){let x=rrange(-65,65),z=rrange(-65,65),y=height(x,z);if(y<1.5)continue;let sz=rrange(.17,.46),green=[.25,.43,.20];m.tri([x,y,z],[x+sz,y+sz*2,z+sz*.1],[x+sz*.5,y,z+sz*.4],green);m.tri([x,y,z],[x-sz,y+sz*1.8,z-sz*.2],[x-sz*.5,y,z-sz*.4],green);}
-for(let i=0;i<83;i++){let a=rrange(0,2*PI),r=rrange(5,66),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.25)continue;let types=['stone','wood','fiber','coconut'],type=types[i%4];resources.push({id:i,type,x,z,y,active:true,cooldown:0});}
-// New decorative scatter uses a SEPARATE random stream: existing items stay in place.
-let seed=(worldSeed^0x5c3e91ab)>>>0;function decorRand(){seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296;}
-for(let k=0;k<830;k++){let x=(decorRand()-.5)*146,z=(decorRand()-.5)*146,y=height(x,z);if(y<.20||y>8.7)continue;let t=decorRand();if(y<2.8){if(t<.47){let sz=.07+decorRand()*.13,co=t<.25?[.70,.62,.48]:[.56,.53,.46];m.orb(x,y+sz*.1,z,sz,co);}else if(t<.68){let len=.35+decorRand()*.8;m.cyl(x,y+.045,z,y+.07,.035,.025,[.39,.28,.17],5,len*.8,len*.2);}else{let b=.12+decorRand()*.21;m.tri([x,y+.025,z],[x+b,y+.04,z+b*.28],[x+b*.6,y+.13,z+b*.5],[.75,.69,.53]);}}
-else {let sz=.14+decorRand()*.45,col=t<.45?[.28,.47,.21]:t<.78?[.36,.51,.23]:[.34,.40,.16];m.tri([x,y,z],[x+sz*.35,y+sz*2,z+sz*.24],[x+sz*.8,y,z+sz*.50],col);m.tri([x,y,z],[x-sz*.5,y+sz*1.6,z],[x-sz,y,z-sz*.35],col);if(t>.86)m.orb(x,y+.12,z,.2,[.30,.38,.19]);}}
-worldMesh=m.finish();}
+function spawnWorld(){
+ rngState=worldSeed; resources=[];trees=[];rocks=[];let m=meshBuilder();
+ // Historical random-consumption sequence deliberately preserved so saved resource IDs stay stable.
+ for(let k=0;k<45;k++){
+   let a=rrange(0,2*PI),r=rrange(18,65),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);
+   if(y<.3||y>5.2)continue;
+   let scale=rrange(.78,1.35),le=rrange(1,2.2);
+   for(let f=0;f<8;f++){rrange(-.14,.14);rrange(2.3,3.7);rrange(0,.08);rrange(0,.09);}
+   trees.push({x,z,scale,k});
+ }
+ for(let k=0;k<34;k++){
+   let a=rrange(0,2*PI),r=rrange(2,68),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.1)continue;
+   let sz=rrange(.45,1.4);rocks.push({x,z,sz});
+ }
+ for(let k=0;k<250;k++){
+   let x=rrange(-65,65),z=rrange(-65,65),y=height(x,z);if(y<1.5)continue;
+   let sz=rrange(.17,.46),green=[.23,.36,.16];
+   m.tri([x,y,z],[x+sz,y+sz*2,z+sz*.1],[x+sz*.5,y,z+sz*.4],green);
+   m.tri([x,y,z],[x-sz,y+sz*1.8,z-sz*.2],[x-sz*.5,y,z-sz*.4],green);
+ }
+ for(let i=0;i<83;i++){
+   let a=rrange(0,2*PI),r=rrange(5,66),x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.25)continue;
+   let types=['stone','wood','fiber','coconut'],type=types[i%4];resources.push({id:i,type,x,z,y,active:true,cooldown:0});
+ }
+ // All decorative additions use a distinct, deterministic PRNG and NEVER alter collectible placement.
+ let decorSeed=(worldSeed^0x5c3e91ab)>>>0;
+ function decorRand(){decorSeed=(Math.imul(1664525,decorSeed)+1013904223)>>>0;return decorSeed/4294967296;}
+ let shownTrees=[];
+ for(let t of trees){if(t.k%5<3){addPalm(m,t,t.k);shownTrees.push(t);}}
+ trees=shownTrees;
+ // Believable clumped coastal rock formations: existing locations plus additional low scattered stones.
+ for(let r of rocks)addBoulder(m,r.x,height(r.x,r.z)-.19*r.sz,r.z,r.sz*.90,decorRand()*PI*2);
+ for(let k=0;k<19;k++){let a=decorRand()*PI*2,r=12+decorRand()*60,x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);if(y<.05)continue;
+   let sz=k<8?1.4+decorRand()*.75:.3+decorRand()*.57;
+   rocks.push({x,z,sz});addBoulder(m,x,y-.16*sz,z,sz,decorRand()*PI*2);
+ }
+ // Forest understory: ferns and shrubs clustered in moist interior patches.
+ for(let k=0;k<40;k++){let a=decorRand()*PI*2,r=11+decorRand()*46,x=Math.cos(a)*r,z=Math.sin(a)*r,y=height(x,z);
+   if(y<2.5)continue;addShrub(m,x,y,z,.65+decorRand()*.85,a);
+ }
+ // Wind-friendly tapered tufts, planted above the beach rather than uniformly scattered.
+ for(let k=0;k<180;k++){let x=(decorRand()-.5)*128,z=(decorRand()-.5)*128,y=height(x,z);if(y<2.15)continue;
+   let h=.14+decorRand()*.40;
+   for(let j=0;j<5;j++){let theta=decorRand()*PI*2,dx=Math.cos(theta),dz=Math.sin(theta),f=.48+.5*decorRand();
+     m.tri([x,y+.006,z],[x+dx*h*f,y+h*(.9+decorRand()*.8),z+dz*h*f],[x-dz*.10,y+.009,z+dx*.10],[.19+.08*decorRand(),.38+.10*decorRand(),.12+.035*decorRand()]);
+   }
+ }
+ // Shore pebbles, shells and storm-washed driftwood.
+ for(let k=0;k<240;k++){let x=(decorRand()-.5)*148,z=(decorRand()-.5)*148,y=height(x,z);if(y<.12||y>2.8)continue;
+   let t=decorRand(),sz=.06+decorRand()*.16;
+   if(t<.67)addBoulder(m,x,y-.06*sz,z,sz,decorRand()*PI*2);
+   else if(t<.90){let a=decorRand()*PI*2;m.cyl(x,y+.02,z,y+.035,.05,.045,[.42,.315,.21],5,Math.cos(a)*(.4+decorRand()*.9),Math.sin(a)*(.4+decorRand()*.9));}
+   else m.tri([x,y+.035,z],[x+sz,y+.05,z+sz*.7],[x+sz*.2,y+.09,z+sz*.92],[.87,.82,.70]);
+ }
+ worldMesh=m.finish();
+}
 const recipes=[{key:'knife',name:'Stone knife',need:{stone:1,fiber:1},label:'Cutting tool'},{key:'axe',name:'Stone axe',need:{stone:2,wood:1,fiber:2},label:'A basic survival axe'},{key:'campfire',name:'Campfire',need:{stone:3,wood:3},label:'A permanent landmark'},{key:'shelter',name:'Lean-to shelter',need:{wood:4,fiber:4},label:'A place to rest'}];
 function itemMesh(type){let m=meshBuilder();if(type==='stone'){m.orb(0,.28,0,.41,[.52,.53,.48]);m.orb(.17,.16,.05,.19,[.59,.60,.55]);}if(type==='wood'){m.cyl(-.48,.18,0,.24,.19,.2,[.43,.27,.11],6,.96,0);m.box(0,.18,0,.86,.15,.29,[.45,.30,.16]);}if(type==='fiber'){for(let i=0;i<6;i++){let a=i*PI/3;m.tri([0,.06,0],[Math.cos(a)*.28,.52,Math.sin(a)*.28],[Math.cos(a+.35)*.30,.04,Math.sin(a+.35)*.30],[.25,.55,.21]);}}if(type==='coconut'){m.orb(0,.45,0,.45,[.33,.24,.13]);m.orb(.22,.48,.06,.1,[.39,.30,.16]);}return m.finish()}
-const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;uniform mat4 uVP;uniform vec3 uTranslation;uniform float uTime;uniform float uIsWater;varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;void main(){vec3 pos=aPosition+uTranslation;if(uIsWater>0.5){pos.y+=sin(pos.x*.23+uTime*1.33)*.095+cos(pos.z*.17-uTime*1.18)*.10+sin((pos.x+pos.z)*.095+uTime*.7)*.045;}vWorldPos=pos;vColor=aColor;vNormal=aNormal;gl_Position=uVP*vec4(pos,1.);}`;
-const frag=`precision mediump float;varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;uniform vec3 uCamera;uniform float uIsWater;uniform float uTime;uniform float uNight;
+const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;
+uniform mat4 uVP;uniform vec3 uTranslation;uniform float uTime;uniform float uIsWater;
+varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;
+void main(){vec3 pos=aPosition+uTranslation;
+ if(uIsWater>0.5){pos.y+=sin(pos.x*.25+uTime*1.05)*.095+cos(pos.z*.20-uTime*.93)*.08+sin((pos.x+pos.z)*.09+uTime*.65)*.044;}
+ else if(aColor.g>aColor.r*1.43&&aPosition.y>2.2){float wind=sin(uTime*.81+pos.x*.32+pos.z*.22)*.047;pos.x+=wind;pos.z+=wind*.62;}
+ vWorldPos=pos;vColor=aColor;vNormal=aNormal;gl_Position=uVP*vec4(pos,1.);}`;
+const frag=`precision highp float;
+varying vec3 vColor;varying vec3 vWorldPos;varying vec3 vNormal;
+uniform vec3 uCamera;uniform vec3 uLightDir;uniform float uIsWater;uniform float uTime;uniform float uNight;uniform float uTerrain;
+uniform sampler2D uSandTex;uniform sampler2D uGrassTex;uniform sampler2D uRockTex;uniform sampler2D uSoilTex;
 float hash21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),f.x),f.y);}
-void main(){vec3 col;float d=length(vWorldPos-uCamera);vec3 normal=normalize(vNormal);vec3 lightDir=normalize(vec3(.48,.86,.24));
-if(uIsWater>.5){vec2 q=vWorldPos.xz;float a=atan(q.y,q.x);float rad=73.+4.5*sin(a*3.+1.8)+3.7*sin(a*7.-2.3)+2.*cos(a*11.);float shore=length(q)-rad*.894;float shallow=1.-smoothstep(2.,27.,shore);float n=n2(q*.053+vec2(uTime*.024,-uTime*.013));vec3 deep=vec3(.026,.215,.32),tropic=vec3(.086,.48,.49);col=mix(deep,tropic,shallow*.93);col+=vec3(.017,.044,.056)*(n-.45);
-float wx=cos(q.x*.23+uTime*1.33)*.023+cos((q.x+q.y)*.095+uTime*.7)*.004;float wz=-sin(q.y*.17-uTime*1.18)*.017+cos((q.x+q.y)*.095+uTime*.7)*.004;vec3 nw=normalize(vec3(-wx,.15,-wz));vec3 viewDir=normalize(uCamera-vWorldPos);vec3 halfDir=normalize(lightDir+viewDir);float sun=pow(max(dot(nw,halfDir),0.),68.);col+=vec3(1.,.84,.61)*sun*.85;float fresnel=pow(1.-max(dot(nw,viewDir),0.),2.5);col=mix(col,vec3(.39,.68,.73),fresnel*.24);
-float foam=1.-smoothstep(-1.0,2.5,shore);float stripes=sin(shore*2.4-uTime*1.5+n*2.0);float white=foam*max(0.,stripes)*.31;col+=vec3(.51,.65,.58)*white;
-float ripple=sin(q.x*.48+uTime*1.05)*cos(q.y*.38-uTime*.88);col+=vec3(.008,.023,.03)*ripple;
-}else{
-float sunlight=.38+.62*max(dot(normal,lightDir),0.);col=vColor*sunlight;
-// Low-cost procedural sand grains, ripples, and vegetation mottling.
-float grain=hash21(floor(vWorldPos.xz*5.4));float macro=n2(vWorldPos.xz*.20);float shore=1.-smoothstep(1.1,4.0,vWorldPos.y);float sandWave=sin(vWorldPos.x*10.8+vWorldPos.z*3.6+n2(vWorldPos.xz*.56)*2.3);float surfaceVariation=(grain-.5)*.11+(macro-.5)*.12;col*=1.+surfaceVariation*mix(.5,1.15,shore);col+=vec3(.027,.021,.012)*sandWave*shore*.48;
-}
-float fog=smoothstep(63.,170.,d)*.76;vec3 fogColor=mix(vec3(.69,.81,.80),vec3(.48,.64,.74),smoothstep(75.,175.,d));col=mix(col,fogColor,fog);col*=1.-uNight*.57;gl_FragColor=vec4(col,1.);}`;
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),f.x),f.y);}
+float ht(vec2 q){float a=atan(q.y,q.x),r=length(q);float radius=73.+4.5*sin(a*3.+1.8)+3.7*sin(a*7.-2.3)+2.*cos(a*11.);float t=r/radius;
+float base=9.7*(1.-pow(min(t,1.3),1.7))-1.7;
+float bump=(sin(q.x*.15+q.y*.06)*.5+cos(q.y*.19-q.x*.08)*.46+sin(q.x*.4+q.y*.34)*.12)*max(0.,1.-t)*2.1;
+return base+bump;}
+void main(){
+ float dist=length(vWorldPos-uCamera);vec3 normal=normalize(vNormal),lightDir=normalize(uLightDir);
+ vec3 col=vec3(0.);float alpha=1.;
+ if(uIsWater>.5){
+    vec2 q=vWorldPos.xz;float depth=max(0.,-ht(q));float shallow=1.-smoothstep(.25,16.,depth);
+    float n=n2(q*.075+vec2(uTime*.019,-uTime*.016));
+    vec3 deep=vec3(.018,.17,.285),tropic=vec3(.085,.50,.515);
+    col=mix(deep,tropic,shallow*.97)+vec3(.015,.027,.034)*(n-.35);
+    float wx=cos(q.x*.25+uTime*1.05)*.024+cos((q.x+q.y)*.09+uTime*.65)*.004;
+    float wz=-sin(q.y*.20-uTime*.93)*.016+cos((q.x+q.y)*.09+uTime*.65)*.004;
+    vec3 nw=normalize(vec3(-wx,.16,-wz));vec3 viewDir=normalize(uCamera-vWorldPos);
+    vec3 halfDir=normalize(lightDir+viewDir);
+    float sparkle=pow(max(dot(nw,halfDir),0.),85.);
+    col+=vec3(.94,.82,.61)*sparkle*.75;
+    float fresnel=pow(1.-clamp(dot(nw,viewDir),0.,1.),3.);
+    col=mix(col,vec3(.33,.59,.67),fresnel*.40);
+    float foam=(1.-smoothstep(.0,1.2,depth));
+    float band=sin(depth*5.8+uTime*1.5+n*4.3)+sin(depth*9.0-uTime*1.0+q.x*.17);
+    col+=vec3(.48,.58,.53)*foam*smoothstep(.4,1.65,band)*.58;
+    float ripples=sin(q.x*.68+uTime*.92)*cos(q.y*.54-uTime*.76);
+    col+=vec3(.012,.025,.029)*ripples;
+    alpha=mix(.96,.54,shallow);
+ }else if(uTerrain>.5){
+    vec2 coord=vWorldPos.xz;
+    vec3 dry=texture2D(uSandTex,coord*.33).rgb;
+    vec3 wet=dry*vec3(.74,.81,.81);
+    float damp=1.-smoothstep(.14,1.15,vWorldPos.y);
+    vec3 sand=mix(dry,wet,damp*.66);
+    vec3 soil=texture2D(uSoilTex,coord*.28).rgb;
+    vec3 grass=texture2D(uGrassTex,coord*.25).rgb;
+    vec3 rock=texture2D(uRockTex,coord*.21).rgb;
+    float variety=n2(coord*.12)-.5;
+    float greens=smoothstep(1.6,5.0,vWorldPos.y+variety*.65);
+    vec3 inland=mix(soil,grass,clamp(.52+variety*.33,0.,1.));
+    float rockiness=smoothstep(.13,.40,1.-normal.y)*.85;
+    col=mix(sand,inland,greens);
+    col=mix(col,rock,rockiness);
+    float sunny=.43+.59*max(dot(normal,lightDir),0.);
+    col*=sunny;
+    col*=(.95+.09*n2(coord*.55));
+ }else{
+    float sunlight=.48+.52*max(dot(normal,lightDir),0.);
+    col=vColor*sunlight;
+    float mottled=n2(vWorldPos.xz*.77+vWorldPos.y*.19);
+    col*=.91+.17*mottled;
+ }
+ float fog=smoothstep(65.,186.,dist)*.72;
+ vec3 fogColor=mix(vec3(.76,.84,.78),vec3(.40,.59,.70),smoothstep(70.,190.,dist));
+ col=mix(col,fogColor,fog);
+ col*=1.-uNight*.65;
+ gl_FragColor=vec4(clamp(col,0.,1.),alpha);
+}`;
 function shader(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(sh));return sh;}
 let prog;try{prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,vert));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,frag));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(prog));}catch(e){console.warn('3D graphics shader failure',e);window.tidebreakFallback('3D shader could not start: '+e.message);return;}
-gl.useProgram(prog);const attributes={p:gl.getAttribLocation(prog,'aPosition'),n:gl.getAttribLocation(prog,'aNormal'),c:gl.getAttribLocation(prog,'aColor')};const uniforms={vp:gl.getUniformLocation(prog,'uVP'),tr:gl.getUniformLocation(prog,'uTranslation'),cam:gl.getUniformLocation(prog,'uCamera'),time:gl.getUniformLocation(prog,'uTime'),water:gl.getUniformLocation(prog,'uIsWater'),night:gl.getUniformLocation(prog,'uNight')};
+gl.useProgram(prog);const attributes={p:gl.getAttribLocation(prog,'aPosition'),n:gl.getAttribLocation(prog,'aNormal'),c:gl.getAttribLocation(prog,'aColor')};const uniforms={vp:gl.getUniformLocation(prog,'uVP'),tr:gl.getUniformLocation(prog,'uTranslation'),cam:gl.getUniformLocation(prog,'uCamera'),time:gl.getUniformLocation(prog,'uTime'),water:gl.getUniformLocation(prog,'uIsWater'),night:gl.getUniformLocation(prog,'uNight'),terrain:gl.getUniformLocation(prog,'uTerrain'),light:gl.getUniformLocation(prog,'uLightDir')};
+// Versioned static textures: separate originals, safely uploaded with the rest of the game.
+// No external CDN or paid asset services are needed to render this build.
+const groundTextures=[];const missingTextures=new Set();
+for(let [unit,filename,pixel] of [
+  [0,'sand.webp',[214,198,160,255]],
+  [1,'grass.webp',[76,119,56,255]],
+  [2,'rock.webp',[112,116,108,255]],
+  [3,'soil.webp',[91,74,51,255]]
+]){
+ const tex=gl.createTexture();gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,tex);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array(pixel));
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+ const img=new Image();img.onload=()=>{
+  missingTextures.delete(filename);
+  gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+ };
+ img.onerror=()=>{missingTextures.add(filename);console.warn('Texture missing, using safe color:',filename);$('startupStatus').textContent='Some terrain textures are missing — upload the full assets folder';};
+ img.src='assets/'+filename;
+ groundTextures[unit]=tex;
+}
+gl.useProgram(prog);
+for(let [name,unit] of [['uSandTex',0],['uGrassTex',1],['uRockTex',2],['uSoilTex',3]])gl.uniform1i(gl.getUniformLocation(prog,name),unit);
 function gpu(mesh){let result={count:mesh.count};for(let [name,arr] of [['p',mesh.v],['n',mesh.n],['c',mesh.c]]){let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);result[name]=b;}return result;}
-function bindDraw(obj,tr=[0,0,0],isWater=0){gl.uniform3f(uniforms.tr,...tr);gl.uniform1f(uniforms.water,isWater);for(let name of ['p','n','c']){gl.bindBuffer(gl.ARRAY_BUFFER,obj[name]);gl.enableVertexAttribArray(attributes[name]);gl.vertexAttribPointer(attributes[name],3,gl.FLOAT,false,0,0);}gl.drawArrays(gl.TRIANGLES,0,obj.count);}
+function bindDraw(obj,tr=[0,0,0],isWater=0,isTerrain=0){gl.uniform3f(uniforms.tr,...tr);gl.uniform1f(uniforms.water,isWater);gl.uniform1f(uniforms.terrain,isTerrain);for(let name of ['p','n','c']){gl.bindBuffer(gl.ARRAY_BUFFER,obj[name]);gl.enableVertexAttribArray(attributes[name]);gl.vertexAttribPointer(attributes[name],3,gl.FLOAT,false,0,0);}gl.drawArrays(gl.TRIANGLES,0,obj.count);}
 function perspective(fovy,aspect,near,far){let f=1/Math.tan(fovy/2),o=new Float32Array(16);o[0]=f/aspect;o[5]=f;o[10]=(far+near)/(near-far);o[11]=-1;o[14]=(2*far*near)/(near-far);return o;}
 function lookAt(eye,target){let f=norm(sub(target,eye)),s=norm(cross(f,[0,1,0])),u=cross(s,f),o=new Float32Array(16);o[0]=s[0];o[1]=u[0];o[2]=-f[0];o[4]=s[1];o[5]=u[1];o[6]=-f[1];o[8]=s[2];o[9]=u[2];o[10]=-f[2];o[12]=-s[0]*eye[0]-s[1]*eye[1]-s[2]*eye[2];o[13]=-u[0]*eye[0]-u[1]*eye[1]-u[2]*eye[2];o[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];o[15]=1;return o;}
 function multiply(a,b){let o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let sum=0;for(let k=0;k<4;k++)sum+=a[k*4+j]*b[i*4+k];o[i*4+j]=sum;}return o;}
@@ -235,7 +411,7 @@ const joy={x:0,y:0,pid:-1},knob=$('knob');let lookPid=-1,lastLookX=0,lastLookY=0
 function joyPointer(e){if(joy.pid!==-1&&e.pointerId!==joy.pid)return;joy.pid=e.pointerId;$('joy').setPointerCapture(e.pointerId);moveJoy(e);}
 function moveJoy(e){let rect=$('joy').getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2,dx=e.clientX-cx,dy=e.clientY-cy,len=Math.max(1,Math.hypot(dx,dy)),rad=rect.width*.33,scale=Math.min(1,rad/len);joy.x=dx*scale/rad;joy.y=dy*scale/rad;knob.style.transform=`translate(${dx*scale}px,${dy*scale}px)`;}
 $('joy').addEventListener('pointerdown',joyPointer);$('joy').addEventListener('pointermove',e=>{if(e.pointerId===joy.pid)moveJoy(e)});function joyEnd(e){if(e.pointerId!==joy.pid)return;joy.pid=-1;joy.x=0;joy.y=0;knob.style.transform='';}for(let ev of ['pointercancel','pointerup','lostpointercapture'])$('joy').addEventListener(ev,joyEnd);
-$('lookZone').addEventListener('pointerdown',e=>{if(lookPid!==-1)return;lookPid=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;$('lookZone').setPointerCapture(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookPid||paused)return;let dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;state.yaw-=dx*.005;state.pitch=clamp(state.pitch-dy*.0045,-1.27,1.27);lastLookX=e.clientX;lastLookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookPid)lookPid=-1;});
+$('lookZone').addEventListener('pointerdown',e=>{if(lookPid!==-1)return;lookPid=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;$('lookZone').setPointerCapture(e.pointerId);});$('lookZone').addEventListener('pointermove',e=>{if(e.pointerId!==lookPid||paused)return;let dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;state.yaw+=dx*.005;state.pitch=clamp(state.pitch-dy*.0045,-1.27,1.27);lastLookX=e.clientX;lastLookY=e.clientY;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('lookZone').addEventListener(ev,e=>{if(e.pointerId===lookPid)lookPid=-1;});
 $('actJump').addEventListener('pointerdown',e=>{e.preventDefault();jumpRequested=true});$('actCollect').addEventListener('click',action);$('actRun').addEventListener('pointerdown',()=>runHeld=true);for(let e of ['pointerup','pointercancel','pointerleave'])$('actRun').addEventListener(e,()=>runHeld=false);
 $('invBtn').onclick=()=>modal('inventory');$('craftBtn').onclick=()=>modal('craft');$('pauseBtn').onclick=()=>modal('pause');$('graphicsBtn').onclick=toggleGraphics;$('startBtn').onclick=start;$('saveBtn').onclick=save;
 $('resetBtn').onclick=()=>{if(window.confirm('Delete the saved world and start a new one?')){reset();start();}};
@@ -243,13 +419,19 @@ $('backupBtn').onclick=()=>{if(!save())return;const data=localStorage.getItem(SA
 $('restoreFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{let txt=await f.text(),data=JSON.parse(txt);if(data.version!==1||!data.state||!data.state.bag||!Number.isFinite(data.state.x)||!Number.isFinite(data.state.z))throw Error('Invalid save format');if(!confirm('Replace your current world with this backup?'))return;localStorage.setItem(SAVE,txt);if(!load())throw Error('Could not restore game');toast('Backup restored');modal('pause');}catch(err){toast('Restore failed: '+err.message)}finally{e.target.value=''}});
 for(let el of document.querySelectorAll('.closeBtn'))el.onclick=()=>modal('');$('drinkBtn').onclick=()=>consume('drink');$('eatBtn').onclick=()=>consume('eat');$('recipes').addEventListener('click',e=>{let btn=e.target.closest('[data-recipe]');if(btn)craft(+btn.dataset.recipe);});
 let keys={};document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.code==='Space')jumpRequested=true;if(e.code==='KeyE')action();if(e.code==='KeyI')modal(paused?'':'inventory');if(e.code==='KeyC')modal(paused?'':'craft');if(e.code==='Escape')modal(paused?'':'pause');});document.addEventListener('keyup',e=>keys[e.code]=false);
-let lastButtons={};function controller(dt){let arr=navigator.getGamepads?navigator.getGamepads():[],p=Array.from(arr||[]).find(x=>x&&x.connected);if(!p)return [0,0];let axes=p.axes||[],lookX=Math.abs(axes[2]||0)>.16?axes[2]:0,lookY=Math.abs(axes[3]||0)>.16?axes[3]:0;state.yaw-=lookX*dt*2.4;state.pitch=clamp(state.pitch-lookY*dt*2.2,-1.27,1.27);let map={0:()=>jumpRequested=true,1:()=>modal(paused?'':'inventory'),2:action,3:()=>modal(paused?'':'craft'),9:()=>modal(paused?'':'pause')};for(let [k,fn] of Object.entries(map)){let now=!!(p.buttons[k]&&p.buttons[k].pressed);if(now&&!lastButtons[k])fn();lastButtons[k]=now;}runHeld=!!(p.buttons[10]&&p.buttons[10].pressed);return [Math.abs(axes[0]||0)>.13?axes[0]:0,Math.abs(axes[1]||0)>.13?axes[1]:0];}
+let lastButtons={};function controller(dt){let arr=navigator.getGamepads?navigator.getGamepads():[],p=Array.from(arr||[]).find(x=>x&&x.connected);if(!p)return [0,0];let axes=p.axes||[],lookX=Math.abs(axes[2]||0)>.16?axes[2]:0,lookY=Math.abs(axes[3]||0)>.16?axes[3]:0;state.yaw+=lookX*dt*2.4;state.pitch=clamp(state.pitch-lookY*dt*2.2,-1.27,1.27);let map={0:()=>jumpRequested=true,1:()=>modal(paused?'':'inventory'),2:action,3:()=>modal(paused?'':'craft'),9:()=>modal(paused?'':'pause')};for(let [k,fn] of Object.entries(map)){let now=!!(p.buttons[k]&&p.buttons[k].pressed);if(now&&!lastButtons[k])fn();lastButtons[k]=now;}runHeld=!!(p.buttons[10]&&p.buttons[10].pressed);return [Math.abs(axes[0]||0)>.13?axes[0]:0,Math.abs(axes[1]||0)>.13?axes[1]:0];}
 function jump(){if(state.y<=Math.max(height(state.x,state.z),.1)+1.72){state.vy=5.7;}}
 function update(dt){let gp=controller(dt);if(paused)return;session+=dt;elapsed+=dt;state.time+=dt*1.9;if(state.time>1440){state.time-=1440;state.day++;}state.hunger=clamp(state.hunger-dt*.045,0,100);state.thirst=clamp(state.thirst-dt*.065,0,100);if(state.hunger<=0||state.thirst<=0)state.hp=clamp(state.hp-dt*.8,0,100);else if(state.hp<100&&state.hunger>40&&state.thirst>40)state.hp=clamp(state.hp+dt*.06,0,100);
 if(!state.hp){modal('pause');toast('You passed out. Start a new world to try again.');}
 let mx=joy.x+gp[0]+(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=-joy.y-gp[1]+(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);let len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}let fast=runHeld||keys.ShiftLeft,speed=fast?6.1:3.35;let dx=(Math.cos(state.yaw)*mx+Math.sin(state.yaw)*mz)*speed*dt,dz=(-Math.sin(state.yaw)*mx+Math.cos(state.yaw)*mz)*speed*dt;
-let nx=state.x+dx,nz=state.z+dz,edge=Math.hypot(nx,nz);if(edge<87){let ground=height(nx,nz);if(ground>-.65){state.x=nx;state.z=nz;}}
-if(keys.ArrowLeft)state.yaw+=dt*1.6;if(keys.ArrowRight)state.yaw-=dt*1.6;
+let nx=state.x+dx,nz=state.z+dz,edge=Math.hypot(nx,nz);
+if(edge<87){let ground=height(nx,nz);if(ground>-.65){
+ let blocked=false;
+ for(let t of trees){let min=.38*t.scale+.22,dist=Math.hypot(nx-t.x,nz-t.z),prev=Math.hypot(state.x-t.x,state.z-t.z);if(dist<min&&dist<prev){blocked=true;break;}}
+ if(!blocked)for(let r of rocks){if(r.sz<.75)continue;let min=r.sz*.54+.25,dist=Math.hypot(nx-r.x,nz-r.z),prev=Math.hypot(state.x-r.x,state.z-r.z);if(dist<min&&dist<prev){blocked=true;break;}}
+ if(!blocked){state.x=nx;state.z=nz;}
+ }}
+if(keys.ArrowLeft)state.yaw-=dt*1.6;if(keys.ArrowRight)state.yaw+=dt*1.6;
 let targetY=Math.max(height(state.x,state.z),.04)+1.7;
 if(jumpRequested){jump();jumpRequested=false;}
 state.vy-=12*dt;state.y+=state.vy*dt;if(state.y<targetY){state.y=targetY;state.vy=0;}
@@ -267,12 +449,20 @@ let lastTime=0,animationTime=0;
 function render(now){requestAnimationFrame(render);let dt=lastTime?clamp((now-lastTime)/1000,0,.04):.016;lastTime=now;resize();update(dt);animationTime+=dt;
 let sun=Math.sin((state.time/1440)*PI*2),night=clamp((-sun+.08)*.75,0,.65);$('shade').style.opacity=(night*.72).toFixed(3);
 let c=[state.x,state.y,state.z],look=[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)],p=perspective(PI/2.8,canvas.width/canvas.height,.1,177),v=lookAt(c,add(c,look));gl.useProgram(prog);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uniforms.vp,false,multiply(p,v));gl.uniform3f(uniforms.cam,...c);gl.uniform1f(uniforms.time,animationTime);gl.uniform1f(uniforms.night,night);
-bindDraw(staticWater,[0,0,0],1);bindDraw(staticTerrain);bindDraw(staticWorld);
+let phase=(state.time/1440)*PI*2,solar=Math.sin(phase),sunDir=norm([Math.cos(phase)*.58,Math.max(.10,Math.abs(solar)),.45]);
+gl.uniform3f(uniforms.light,...sunDir);
+let sky=$('sky');sky.style.filter=`brightness(${(.98-night*.86).toFixed(2)}) saturate(${(1.03-night*.41).toFixed(2)})`;
+sky.style.backgroundPosition=`${(50+Math.sin(state.yaw)*7).toFixed(1)}% 46%`;
+$('nightStars').style.opacity=(night*.92).toFixed(2);
+for(let i=0;i<4;i++){gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,groundTextures[i]);}
+gl.disable(gl.BLEND);gl.depthMask(true);bindDraw(staticTerrain,[0,0,0],0,1);bindDraw(staticWorld);
+gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
+bindDraw(staticWater,[0,0,0],1,0);gl.depthMask(true);gl.disable(gl.BLEND);
 for(let r of resources){if(!r.active)continue;let d=Math.hypot(r.x-state.x,r.z-state.z);if(d>65)continue;bindDraw(itemGpu[r.type],[r.x,r.y+.06+Math.sin(animationTime*2+r.id)*.08,r.z]);}
 if(state.campfire){let m=structureGpu.fire;if(!m){let b=meshBuilder();for(let i=0;i<6;i++){let a=i*2*PI/6;b.box(Math.cos(a)*.9,.01,Math.sin(a)*.9,.7,.35,.6,[.42,.40,.37]);}b.cyl(0,.1,0,1.5,.27,.02,[.98,.45,.08],5);m=structureGpu.fire=gpu(b.finish());}let pos=state.campfirePos||[2,50];bindDraw(m,[pos[0],height(pos[0],pos[1]),pos[1]]);}
 if(state.shelter){let m=structureGpu.shelter;if(!m){let b=meshBuilder();b.box(0,0,0,2.7,.22,2.1,[.40,.27,.15]);for(let x of [-1.15,1.15])for(let z of [-.8,.8])b.cyl(x,.22,z,2.5,.13,.10,[.42,.29,.13]);b.quad([-1.5,2.4,-1.1],[1.5,2.4,-1.1],[1.5,1.5,1.1],[-1.5,1.5,1.1],[.38,.38,.18]);m=structureGpu.shelter=gpu(b.finish());}let pos=state.shelterPos||[6,50];bindDraw(m,[pos[0],height(pos[0],pos[1]),pos[1]]);}
 }
-rebuildWorld();if(load()){$('startBtn').textContent='CONTINUE SURVIVING';}else $('startBtn').textContent='START SURVIVING';$('startupStatus').textContent='3D graphics ready · Tap Start Surviving';$('helpHint').style.display='none';requestAnimationFrame(render);
+rebuildWorld();if(load()){$('startBtn').textContent='CONTINUE SURVIVING';}else $('startBtn').textContent='START SURVIVING';$('startupStatus').textContent='Realism environment ready · Tap Start Surviving';$('helpHint').style.display='none';requestAnimationFrame(render);
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();if(state.started)save();});canvas.addEventListener('webglcontextrestored',()=>location.reload());window.addEventListener('pagehide',()=>{if(state.started)save();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.started)save();});
 if('serviceWorker' in navigator && location.protocol.startsWith('https'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
